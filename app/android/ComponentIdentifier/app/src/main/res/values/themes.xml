@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.ComponentIdentifier" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="SplashScreenTheme" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.ComponentIdentifier</item>
+        <item name="windowSplashScreenBackground">@color/light_blue</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/baseline_search_24</item>
+    </style>
 </resources>
