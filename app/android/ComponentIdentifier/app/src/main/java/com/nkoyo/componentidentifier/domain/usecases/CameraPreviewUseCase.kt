@@ -1,4 +1,4 @@
-package com.nkoyo.componentidentifier.domain.extensions.usecases
+package com.nkoyo.componentidentifier.domain.usecases
 
 import androidx.camera.core.Preview
 import androidx.camera.view.PreviewView

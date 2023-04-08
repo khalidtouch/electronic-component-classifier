@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.nkoyo.componentidentifier.ui.screens.main.MainPreviewScreen
+import com.nkoyo.componentidentifier.ui.screens.main.MainScreen
 
 /**
  * The Composable that handles the navigation and routing through
@@ -19,14 +20,14 @@ fun NavHostWrapper(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     onAbortApplication: () -> Unit,
-    startDestination: String = Route.MainPreview
+    startDestination: String = Route.MainScreen
 ){
     NavHost(
         navController = navController,
         startDestination = startDestination,
     ) {
-        composable(Route.MainPreview){
-            MainPreviewScreen(
+        composable(Route.MainScreen){
+            MainScreen(
                 navController = navController,
                 onAbortApplication = onAbortApplication
             )
@@ -34,6 +35,7 @@ fun NavHostWrapper(
     }
 }
 
+
 object Route {
-    const val MainPreview = "MainPreview"
+    const val MainScreen = "MainScreen"
 }

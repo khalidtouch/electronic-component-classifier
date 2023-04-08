@@ -1,12 +1,16 @@
 package com.nkoyo.componentidentifier.ui.screens.main
 
+import android.util.Log
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,9 +26,14 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.nkoyo.componentidentifier.R
+import com.nkoyo.componentidentifier.domain.extensions.executor
 import com.nkoyo.componentidentifier.domain.extensions.getCameraProvider
-import com.nkoyo.componentidentifier.domain.extensions.usecases.CameraPreviewUseCase
+import com.nkoyo.componentidentifier.domain.extensions.takeSnapshot
+import com.nkoyo.componentidentifier.domain.usecases.CameraPreviewUseCase
+import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
+import com.nkoyo.componentidentifier.ui.theme.LocalBlack
 import kotlinx.coroutines.launch
+import java.io.File
 import java.lang.Exception
 
 
@@ -33,11 +42,11 @@ import java.lang.Exception
 fun MainPreviewScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    onAbortApplication: () -> Unit,
+    onAbortApplication: () -> Unit = {},
+    onSavePhotoFile: (File) -> Unit = {},
     cameraPermissionState: PermissionState = rememberPermissionState(
         android.Manifest.permission.CAMERA
     ),
-    permissionRationale: String = stringResource(id = R.string.permission_is_important),
     permissionNotAvailableContent: @Composable () -> Unit = {
         PermissionNotAvailableContent(
             cameraPermissionState = cameraPermissionState,
@@ -47,20 +56,22 @@ fun MainPreviewScreen(
     content: @Composable (
         flashLightState: MutableState<Boolean>,
         onToggleFlashLight: () -> Unit,
-    ) -> Unit = { flashlightState, onToggleFlashLight ->
+        onTakeSnapshot: () -> Unit,
+    ) -> Unit = { flashlightState, onToggleFlashLight, onTakeSnapshot ->
         MainPreviewScreenContent(
             flashLightState = flashlightState,
-            onToggleFlashLight = onToggleFlashLight
+            onToggleFlashLight = onToggleFlashLight,
+            onTakeSnapshot = onTakeSnapshot
         )
     },
 ) {
+    val TAG = "MainPreviewScreen"
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
     val cameraSelector: MutableState<CameraSelector> = remember {
         mutableStateOf(CameraSelector.DEFAULT_BACK_CAMERA)
     }
-    val flashLightState = remember { mutableStateOf(false) }
 
     val previewView: PreviewView = remember {
         val view = PreviewView(context).apply {
@@ -70,23 +81,28 @@ fun MainPreviewScreen(
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         }
-        val cameraPreviewUseCase = CameraPreviewUseCase()
-
-        coroutineScope.launch {
-            val provider = context.getCameraProvider()
-            try {
-                provider.unbindAll()
-                provider.bindToLifecycle(
-                    lifecycleOwner,
-                    cameraSelector.value,
-                    cameraPreviewUseCase.of(view)
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
         view
     }
+
+    val flashLightState = remember { mutableStateOf(false) }
+    val cameraPreviewUseCase = remember { mutableStateOf(CameraPreviewUseCase().of(previewView)) }
+    val imageCaptureUseCase = remember { mutableStateOf(ImageCaptureUseCase().of()) }
+
+    LaunchedEffect(Unit, cameraPreviewUseCase.value) {
+        val provider = context.getCameraProvider()
+        try {
+            provider.unbindAll()
+            provider.bindToLifecycle(
+                lifecycleOwner,
+                cameraSelector.value,
+                cameraPreviewUseCase.value,
+                imageCaptureUseCase.value,
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 
     Surface(modifier = Modifier.fillMaxSize()) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
@@ -94,6 +110,7 @@ fun MainPreviewScreen(
                 factory = { previewView },
                 modifier = Modifier.fillMaxSize()
             )
+            Log.e(TAG, "MainPreviewScreen: Preview Screen")
 
             if (!cameraPermissionState.status.isGranted) {
                 permissionNotAvailableContent()
@@ -102,6 +119,12 @@ fun MainPreviewScreen(
                     flashLightState = flashLightState,
                     onToggleFlashLight = {
                         flashLightState.value = !flashLightState.value
+                    },
+                    onTakeSnapshot = {
+                        coroutineScope.launch {
+                            imageCaptureUseCase.value.takeSnapshot(context.executor)
+                                .let(onSavePhotoFile)
+                        }
                     }
                 )
             }

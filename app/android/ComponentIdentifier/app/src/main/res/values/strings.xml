@@ -7,4 +7,6 @@
     <string name="get_started">Get Started</string>
     <string name="close">Close</string>
     <string name="toggle_flashlight">Toggle Flashlight</string>
+    <string name="saved_photoS">Saved Photo</string>
+    <string name="saved_photo">Saved Photo</string>
 </resources>
