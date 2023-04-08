@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.nkoyo.componentidentifier.ui.screens.MainPreviewScreen
+import com.nkoyo.componentidentifier.ui.screens.main.MainPreviewScreen
 
 /**
  * The Composable that handles the navigation and routing through

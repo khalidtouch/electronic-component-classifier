@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -33,6 +34,7 @@ import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.ui.theme.LocalBlack
 import com.nkoyo.componentidentifier.ui.theme.LocalGray
 import com.nkoyo.componentidentifier.ui.theme.LocalWhite
+import com.nkoyo.componentidentifier.ui.theme.LocalYellow
 
 @Composable
 fun SecondaryButton(
@@ -113,6 +115,42 @@ fun ShowRecordButton(
     }
 }
 
+@Composable
+fun CircleIconButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    icon: Int,
+    iconSize: Dp = 24.dp,
+    surfaceColor: Color = LocalWhite,
+    borderColor: Color = LocalBlack,
+    tint: Color = LocalBlack,
+    contentDescription: String,
+    padding: Dp = 8.dp,
+    selected: Boolean = false,
+) {
+    Surface(
+        modifier = modifier
+            .size(32.dp)
+            .clip(CircleShape)
+            .clickable { onClick() },
+        color = surfaceColor,
+        shape = CircleShape,
+        border = BorderStroke(
+            1.5.dp, color =  if(selected) LocalYellow else borderColor,
+        )
+    ) {
+        Icon(
+            painter = painterResource(id = icon),
+            contentDescription = contentDescription,
+            modifier = modifier
+                .size(iconSize)
+                .clip(CircleShape)
+                .padding(padding),
+            tint = if(selected) LocalYellow else tint,
+        )
+    }
+}
+
 
 @Composable
 fun CameraFlipButton(
@@ -124,6 +162,7 @@ fun CameraFlipButton(
             .size(32.dp)
             .clip(CircleShape)
             .clickable { onClick() },
+        shape = CircleShape,
         color = LocalGray,
     ) {
         Icon(
