@@ -3,4 +3,6 @@
     <string name="permission_is_importantT">This permission is important for this app. Please grant the permission.</string>
     <string name="permission_is_important">Permission is important for this app. Please grant the permission.</string>
     <string name="flip_camera">Flip Camera</string>
+    <string name="abort">Abort</string>
+    <string name="get_started">Get Started</string>
 </resources>

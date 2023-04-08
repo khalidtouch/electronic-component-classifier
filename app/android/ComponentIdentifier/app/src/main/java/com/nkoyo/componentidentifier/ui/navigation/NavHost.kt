@@ -18,6 +18,7 @@ import com.nkoyo.componentidentifier.ui.screens.MainPreviewScreen
 fun NavHostWrapper(
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    onAbortApplication: () -> Unit,
     startDestination: String = Route.MainPreview
 ){
     NavHost(
@@ -27,6 +28,7 @@ fun NavHostWrapper(
         composable(Route.MainPreview){
             MainPreviewScreen(
                 navController = navController,
+                onAbortApplication = onAbortApplication
             )
         }
     }

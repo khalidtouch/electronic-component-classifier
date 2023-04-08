@@ -34,12 +34,16 @@ import com.nkoyo.componentidentifier.ui.screens.main.PermissionNotAvailableConte
 fun MainPreviewScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    onAbortApplication: () -> Unit,
     cameraPermissionState: PermissionState = rememberPermissionState(
         android.Manifest.permission.CAMERA
     ),
     permissionRationale: String = stringResource(id = R.string.permission_is_important),
     permissionNotAvailableContent: @Composable () -> Unit = {
-         PermissionNotAvailableContent(cameraPermissionState = cameraPermissionState)
+         PermissionNotAvailableContent(
+             cameraPermissionState = cameraPermissionState,
+             onAbort = onAbortApplication
+         )
     },
     content: @Composable () -> Unit = { MainPreviewScreenContent() },
 ) {
