@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.nkoyo.componentidentifier.R
+import com.nkoyo.componentidentifier.domain.extensions.usecases.CameraPreviewUseCase
 import com.nkoyo.componentidentifier.ui.components.SecondaryButton
 import com.nkoyo.componentidentifier.ui.components.TertiaryButton
 import com.nkoyo.componentidentifier.ui.theme.LocalBlack
@@ -50,6 +51,7 @@ fun PermissionNotAvailableContent(
         }
         append(". This uses machine learning to produce component information with a high accuracy.")
     }
+
 
     Surface(modifier = modifier) {
         Box(
