@@ -37,6 +37,9 @@ fun MainPreviewScreenContent(
     modifier: Modifier = Modifier,
     onClose: () -> Unit = {},
     onToggleFlashLight: () -> Unit = {},
+    onTakeSnapshot: () -> Unit = {},
+    onToggleCamera: () -> Unit = {},
+    onViewRecords: () -> Unit = {},
     flashLightState: MutableState<Boolean> = remember { mutableStateOf(false)},
 ) {
     BoxWithConstraints(
@@ -57,7 +60,12 @@ fun MainPreviewScreenContent(
         }
 
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-            BottomActionButtons(parentWidth = parentWidth)
+            BottomActionButtons(
+                parentWidth = parentWidth,
+                onTakeSnapshot = onTakeSnapshot,
+                onViewRecords = onViewRecords,
+                onToggleCamera = onToggleCamera,
+            )
         }
     }
 }
@@ -105,6 +113,9 @@ fun TopActionButtons(
 fun BottomActionButtons(
     modifier: Modifier = Modifier,
     parentWidth: Dp,
+    onTakeSnapshot: () -> Unit = {},
+    onToggleCamera: () -> Unit = {},
+    onViewRecords: () -> Unit = {},
 ) {
     Surface(
         modifier = modifier,
@@ -119,15 +130,15 @@ fun BottomActionButtons(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ShowRecordButton(
-                onClick = {}
+                onClick = onViewRecords
             )
 
             SnapshotButton(
-                onClick = {}
+                onClick = onTakeSnapshot
             )
 
             CameraFlipButton(
-                onClick = {}
+                onClick = onToggleCamera
             )
         }
     }
