@@ -5,4 +5,6 @@
     <string name="flip_camera">Flip Camera</string>
     <string name="abort">Abort</string>
     <string name="get_started">Get Started</string>
+    <string name="close">Close</string>
+    <string name="toggle_flashlight">Toggle Flashlight</string>
 </resources>

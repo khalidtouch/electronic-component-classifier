@@ -1,4 +1,4 @@
-package com.nkoyo.componentidentifier.ui.screens
+package com.nkoyo.componentidentifier.ui.screens.main
 
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
@@ -24,8 +24,6 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.domain.extensions.getCameraProvider
 import com.nkoyo.componentidentifier.domain.extensions.usecases.CameraPreviewUseCase
-import com.nkoyo.componentidentifier.ui.screens.main.MainPreviewScreenContent
-import com.nkoyo.componentidentifier.ui.screens.main.PermissionNotAvailableContent
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
@@ -41,12 +39,20 @@ fun MainPreviewScreen(
     ),
     permissionRationale: String = stringResource(id = R.string.permission_is_important),
     permissionNotAvailableContent: @Composable () -> Unit = {
-         PermissionNotAvailableContent(
-             cameraPermissionState = cameraPermissionState,
-             onAbort = onAbortApplication
-         )
+        PermissionNotAvailableContent(
+            cameraPermissionState = cameraPermissionState,
+            onAbort = onAbortApplication
+        )
     },
-    content: @Composable () -> Unit = { MainPreviewScreenContent() },
+    content: @Composable (
+        flashLightState: MutableState<Boolean>,
+        onToggleFlashLight: () -> Unit,
+    ) -> Unit = { flashlightState, onToggleFlashLight ->
+        MainPreviewScreenContent(
+            flashLightState = flashlightState,
+            onToggleFlashLight = onToggleFlashLight
+        )
+    },
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -54,6 +60,7 @@ fun MainPreviewScreen(
     val cameraSelector: MutableState<CameraSelector> = remember {
         mutableStateOf(CameraSelector.DEFAULT_BACK_CAMERA)
     }
+    val flashLightState = remember { mutableStateOf(false) }
 
     val previewView: PreviewView = remember {
         val view = PreviewView(context).apply {
@@ -74,7 +81,7 @@ fun MainPreviewScreen(
                     cameraSelector.value,
                     cameraPreviewUseCase.of(view)
                 )
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
@@ -91,7 +98,12 @@ fun MainPreviewScreen(
             if (!cameraPermissionState.status.isGranted) {
                 permissionNotAvailableContent()
             } else {
-                content()
+                content(
+                    flashLightState = flashLightState,
+                    onToggleFlashLight = {
+                        flashLightState.value = !flashLightState.value
+                    }
+                )
             }
 
         }
