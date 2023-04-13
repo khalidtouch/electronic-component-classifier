@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Component Identifier</string>
+    <string name="permission_is_importantT">This permission is important for this app. Please grant the permission.</string>
+    <string name="permission_is_important">Permission is important for this app. Please grant the permission.</string>
+    <string name="flip_camera">Flip Camera</string>
+    <string name="abort">Abort</string>
+    <string name="get_started">Get Started</string>
+    <string name="close">Close</string>
+    <string name="toggle_flashlight">Toggle Flashlight</string>
+    <string name="saved_photoS">Saved Photo</string>
+    <string name="saved_photo">Saved Photo</string>
+    <string name="backslash">backslash</string>
 </resources>
