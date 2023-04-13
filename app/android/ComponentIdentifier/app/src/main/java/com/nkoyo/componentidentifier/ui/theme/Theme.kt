@@ -67,10 +67,7 @@ fun ComponentIdentifierTheme(
     val systemUiController = rememberSystemUiController()
     SideEffect {
         systemUiController.apply {
-            isStatusBarVisible = false
-            isNavigationBarVisible = false
-            isSystemBarsVisible = false
-            setStatusBarColor(Color.Transparent)
+            setStatusBarColor(color = LocalBlack)
         }
     }
 

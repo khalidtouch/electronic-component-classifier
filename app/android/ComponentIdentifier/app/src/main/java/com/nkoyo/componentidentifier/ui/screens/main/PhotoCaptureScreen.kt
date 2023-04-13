@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -75,8 +76,8 @@ fun RemoveSavedPhotoButton(
             icon = R.drawable.icon_close,
             contentDescription = stringResource(id = R.string.close),
             onClick = onRemove,
-            surfaceColor = LocalWhite,
-            borderColor = LocalWhite,
+            surfaceColor = Color.Transparent,
+            borderColor = LocalBlack,
             tint = LocalBlack
         )
     }
