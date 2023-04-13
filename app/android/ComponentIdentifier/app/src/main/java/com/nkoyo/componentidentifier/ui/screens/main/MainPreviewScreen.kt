@@ -96,7 +96,8 @@ fun MainPreviewScreen(
     val cameraPreviewUseCase = remember { mutableStateOf(CameraPreviewUseCase().of(previewView)) }
     val imageCaptureUseCase = remember { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
 
-    LaunchedEffect(Unit, cameraPreviewUseCase.value) {
+    LaunchedEffect(Unit, cameraPreviewUseCase.value, cameraSelector) {
+        Log.e(TAG, "MainPreviewScreen: refresh camera use-case bindings")
         val provider = context.getCameraProvider()
         try {
             provider.unbindAll()
