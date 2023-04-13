@@ -10,4 +10,11 @@
     <string name="saved_photoS">Saved Photo</string>
     <string name="saved_photo">Saved Photo</string>
     <string name="backslash">backslash</string>
+    <string name="prediction_one">Prediction 1</string>
+    <string name="probability_one">Probability 1</string>
+    <string name="inference_time">Inference Time</string>
+    <string name="probability_three">Probability 3</string>
+    <string name="prediction_three">Prediction 3</string>
+    <string name="prediction_two">Prediction 2</string>
+    <string name="probability_two">Probability 2</string>
 </resources>
