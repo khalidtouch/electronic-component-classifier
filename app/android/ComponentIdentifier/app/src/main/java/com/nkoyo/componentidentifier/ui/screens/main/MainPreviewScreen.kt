@@ -12,6 +12,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -20,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -30,8 +33,10 @@ import com.nkoyo.componentidentifier.domain.extensions.executor
 import com.nkoyo.componentidentifier.domain.extensions.getCameraProvider
 import com.nkoyo.componentidentifier.domain.extensions.takeSnapshot
 import com.nkoyo.componentidentifier.domain.usecases.CameraPreviewUseCase
+import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
 import com.nkoyo.componentidentifier.ui.theme.LocalBlack
+import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.Exception
@@ -41,6 +46,7 @@ import java.lang.Exception
 @Composable
 fun MainPreviewScreen(
     modifier: Modifier = Modifier,
+    mainViewModel: MainViewModel = hiltViewModel<MainViewModel>(),
     navController: NavHostController,
     onAbortApplication: () -> Unit = {},
     onSavePhotoFile: (File) -> Unit = {},
@@ -54,14 +60,17 @@ fun MainPreviewScreen(
         )
     },
     content: @Composable (
-        flashLightState: MutableState<Boolean>,
+        flashLightState: ImageCaptureFlashMode,
         onToggleFlashLight: () -> Unit,
         onTakeSnapshot: () -> Unit,
-    ) -> Unit = { flashlightState, onToggleFlashLight, onTakeSnapshot ->
+        onToggleCamera: () -> Unit,
+    ) -> Unit = { flashlightState, onToggleFlashLight, onTakeSnapshot, onToggleCamera ->
         MainPreviewScreenContent(
             flashLightState = flashlightState,
             onToggleFlashLight = onToggleFlashLight,
-            onTakeSnapshot = onTakeSnapshot
+            onTakeSnapshot = onTakeSnapshot,
+            onToggleCamera = onToggleCamera,
+            onClose = onAbortApplication
         )
     },
 ) {
@@ -69,9 +78,7 @@ fun MainPreviewScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
-    val cameraSelector: MutableState<CameraSelector> = remember {
-        mutableStateOf(CameraSelector.DEFAULT_BACK_CAMERA)
-    }
+    val cameraSelector by mainViewModel.cameraSelector.collectAsState()
 
     val previewView: PreviewView = remember {
         val view = PreviewView(context).apply {
@@ -84,9 +91,10 @@ fun MainPreviewScreen(
         view
     }
 
-    val flashLightState = remember { mutableStateOf(false) }
+    val flashLightState by mainViewModel.flashLightState.collectAsState()
+
     val cameraPreviewUseCase = remember { mutableStateOf(CameraPreviewUseCase().of(previewView)) }
-    val imageCaptureUseCase = remember { mutableStateOf(ImageCaptureUseCase().of()) }
+    val imageCaptureUseCase = remember { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
 
     LaunchedEffect(Unit, cameraPreviewUseCase.value) {
         val provider = context.getCameraProvider()
@@ -94,7 +102,7 @@ fun MainPreviewScreen(
             provider.unbindAll()
             provider.bindToLifecycle(
                 lifecycleOwner,
-                cameraSelector.value,
+                cameraSelector,
                 cameraPreviewUseCase.value,
                 imageCaptureUseCase.value,
             )
@@ -118,12 +126,30 @@ fun MainPreviewScreen(
                 content(
                     flashLightState = flashLightState,
                     onToggleFlashLight = {
-                        flashLightState.value = !flashLightState.value
+                        when(flashLightState){
+                            //  circular control
+                            is ImageCaptureFlashMode.Auto -> {
+                                mainViewModel.onFlashLightStateChanged(ImageCaptureFlashMode.On)
+                            }
+                            is ImageCaptureFlashMode.On -> {
+                                mainViewModel.onFlashLightStateChanged(ImageCaptureFlashMode.Off)
+                            }
+                            is ImageCaptureFlashMode.Off -> {
+                                mainViewModel.onFlashLightStateChanged(ImageCaptureFlashMode.Auto)
+                            }
+                        }
                     },
                     onTakeSnapshot = {
                         coroutineScope.launch {
                             imageCaptureUseCase.value.takeSnapshot(context.executor)
                                 .let(onSavePhotoFile)
+                        }
+                    },
+                    onToggleCamera = {
+                        if(cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA){
+                            mainViewModel.onCameraSelectorChanged(CameraSelector.DEFAULT_FRONT_CAMERA)
+                        } else {
+                            mainViewModel.onCameraSelectorChanged(CameraSelector.DEFAULT_BACK_CAMERA)
                         }
                     }
                 )
