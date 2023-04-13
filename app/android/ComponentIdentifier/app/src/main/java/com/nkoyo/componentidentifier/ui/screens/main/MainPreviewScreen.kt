@@ -3,6 +3,7 @@ package com.nkoyo.componentidentifier.ui.screens.main
 import android.util.Log
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,7 @@ import com.nkoyo.componentidentifier.domain.extensions.executor
 import com.nkoyo.componentidentifier.domain.extensions.getCameraProvider
 import com.nkoyo.componentidentifier.domain.extensions.takeSnapshot
 import com.nkoyo.componentidentifier.domain.usecases.CameraPreviewUseCase
+import com.nkoyo.componentidentifier.domain.usecases.ImageAnalysisUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
 import com.nkoyo.componentidentifier.ui.theme.LocalBlack
@@ -79,6 +81,7 @@ fun MainPreviewScreen(
     val coroutineScope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraSelector by mainViewModel.cameraSelector.collectAsState()
+    val cameraExecutor = mainViewModel.cameraExecutor
 
     val previewView: PreviewView = remember {
         val view = PreviewView(context).apply {
@@ -95,10 +98,22 @@ fun MainPreviewScreen(
 
     val cameraPreviewUseCase = remember { mutableStateOf(CameraPreviewUseCase().of(previewView)) }
     val imageCaptureUseCase = remember { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
+    val imageAnalysisUseCase = remember { mutableStateOf(ImageAnalysisUseCase().of())}
 
     LaunchedEffect(Unit, cameraPreviewUseCase.value, cameraSelector) {
         Log.e(TAG, "MainPreviewScreen: refresh camera use-case bindings")
         val provider = context.getCameraProvider()
+        mainViewModel.initialize() //initialize Classifier
+
+        imageAnalysisUseCase.value.setAnalyzer(cameraExecutor, ImageAnalysis.Analyzer { imageProxy ->
+            Log.e(TAG, "MainPreviewScreen: image is being analyzed")
+            val generatedBitmap = imageProxy.toBitmap()
+            val classifiedResults = mainViewModel.classify(generatedBitmap)
+            Log.e(TAG, "MainPreviewScreen: the classified results are : ${classifiedResults.toString()}")
+
+            imageProxy.close()
+        })
+
         try {
             provider.unbindAll()
             provider.bindToLifecycle(
@@ -106,6 +121,7 @@ fun MainPreviewScreen(
                 cameraSelector,
                 cameraPreviewUseCase.value,
                 imageCaptureUseCase.value,
+                imageAnalysisUseCase.value,
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -119,7 +135,6 @@ fun MainPreviewScreen(
                 factory = { previewView },
                 modifier = Modifier.fillMaxSize()
             )
-            Log.e(TAG, "MainPreviewScreen: Preview Screen")
 
             if (!cameraPermissionState.status.isGranted) {
                 permissionNotAvailableContent()

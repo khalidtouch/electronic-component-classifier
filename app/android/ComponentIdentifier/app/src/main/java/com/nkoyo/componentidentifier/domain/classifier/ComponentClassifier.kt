@@ -8,7 +8,7 @@ interface ComponentClassifier {
 
     fun classify(bitmap: Bitmap): HashMap<String, String>
 
-    fun loadData(context: Context, filename: String): ArrayList<String>
+    fun loadLabelData(context: Context, filename: String): ArrayList<String>
 
     fun close()
 

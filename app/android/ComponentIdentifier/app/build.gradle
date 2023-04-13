@@ -100,6 +100,8 @@ dependencies {
     implementation 'org.tensorflow:tensorflow-lite:2.12.0'
     // TFLite GPU delegate 2.3.0 or above is required.
     implementation 'org.tensorflow:tensorflow-lite-gpu:2.12.0'
+    //for backward API compatibility
+    implementation 'org.tensorflow:tensorflow-lite-gpu-api:2.12.0'
 }
 
 // Allow references to generated code
