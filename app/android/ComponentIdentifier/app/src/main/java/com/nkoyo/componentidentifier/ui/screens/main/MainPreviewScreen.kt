@@ -29,10 +29,12 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.common.util.concurrent.ListenableFuture
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.domain.extensions.executor
 import com.nkoyo.componentidentifier.domain.extensions.getCameraProvider
 import com.nkoyo.componentidentifier.domain.extensions.takeSnapshot
+import com.nkoyo.componentidentifier.domain.extensions.toBitmap2
 import com.nkoyo.componentidentifier.domain.usecases.CameraPreviewUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageAnalysisUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
@@ -82,6 +84,7 @@ fun MainPreviewScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraSelector by mainViewModel.cameraSelector.collectAsState()
     val cameraExecutor = mainViewModel.cameraExecutor
+    val flashLightExecutor = mainViewModel.flashLightExecutor
 
     val previewView: PreviewView = remember {
         val view = PreviewView(context).apply {
@@ -97,32 +100,40 @@ fun MainPreviewScreen(
     val flashLightState by mainViewModel.flashLightState.collectAsState()
 
     val cameraPreviewUseCase = remember { mutableStateOf(CameraPreviewUseCase().of(previewView)) }
-    val imageCaptureUseCase = remember { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
+    val imageCaptureUseCase = remember(flashLightState) { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
     val imageAnalysisUseCase = remember { mutableStateOf(ImageAnalysisUseCase().of())}
 
-    LaunchedEffect(Unit, cameraPreviewUseCase.value, cameraSelector) {
+    LaunchedEffect(Unit, cameraPreviewUseCase.value, cameraSelector, flashLightState) {
         Log.e(TAG, "MainPreviewScreen: refresh camera use-case bindings")
         val provider = context.getCameraProvider()
         mainViewModel.initialize() //initialize Classifier
 
         imageAnalysisUseCase.value.setAnalyzer(cameraExecutor, ImageAnalysis.Analyzer { imageProxy ->
             Log.e(TAG, "MainPreviewScreen: image is being analyzed")
-            val generatedBitmap = imageProxy.toBitmap()
+            val generatedBitmap = imageProxy.toBitmap() ?: return@Analyzer
             val classifiedResults = mainViewModel.classify(generatedBitmap)
             Log.e(TAG, "MainPreviewScreen: the classified results are : ${classifiedResults.toString()}")
-
             imageProxy.close()
         })
 
         try {
             provider.unbindAll()
-            provider.bindToLifecycle(
+            val camera = provider.bindToLifecycle(
                 lifecycleOwner,
                 cameraSelector,
                 cameraPreviewUseCase.value,
                 imageCaptureUseCase.value,
                 imageAnalysisUseCase.value,
             )
+            val cameraControl = camera.cameraControl
+            val torch: ListenableFuture<Void> = cameraControl.enableTorch(flashLightState == ImageCaptureFlashMode.On)
+            torch.addListener({
+                try {
+                    torch.get()
+                } catch (e: Exception){
+                    e.printStackTrace()
+                }
+            }, flashLightExecutor)
         } catch (e: Exception) {
             e.printStackTrace()
         }

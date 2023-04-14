@@ -31,6 +31,7 @@ class MainViewModel @Inject constructor(
     val flashLightState: StateFlow<ImageCaptureFlashMode> = _flashLightState
 
     val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    val flashLightExecutor: ExecutorService = Executors.newSingleThreadExecutor()
 
     fun onCameraSelectorChanged(selector: CameraSelector) {
         _cameraSelector.value = selector
