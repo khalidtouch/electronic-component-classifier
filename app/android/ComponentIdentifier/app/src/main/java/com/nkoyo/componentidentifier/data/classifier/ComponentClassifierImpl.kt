@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.os.SystemClock
+import android.util.Log
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.domain.classifier.ComponentClassifier
 import com.nkoyo.componentidentifier.domain.extensions.appendPercent
@@ -35,6 +36,7 @@ const val LABEL_FILENAME = "labels.txt"
 class ComponentClassifierImpl @Inject constructor(
     @ApplicationContext val context: Context,
 ) : ComponentClassifier {
+    val TAG = "ComponentClassifierImpl"
     private var interpreter: Interpreter? = null
     private var gpuDelegate: GpuDelegate? = null
     private var imageBuffer: TensorImage? = null
@@ -77,6 +79,7 @@ class ComponentClassifierImpl @Inject constructor(
             imageBuffer = convertImageIntoTensorImage(bitmap)
             val output = Array(1) { FloatArray(labels.size) }
 
+
             val startTime = SystemClock.uptimeMillis()
             interpreter?.run(imageBuffer?.buffer, output) //interprete the image
             val endTime = SystemClock.uptimeMillis()
@@ -84,8 +87,13 @@ class ComponentClassifierImpl @Inject constructor(
             var inferenceTime = endTime - startTime
             val indexArray = getMaxResultFromFloatArray(output[0])
 
+            Log.e(TAG, "classify: prob values are ${output[0].map { (it * 100).toString() }}")
+
+            Log.e(
+                TAG,
+                "classify: the index array of prob is ${indexArray.map { it.toString() }}")
             val firstProbability =
-                (output.first()[indexArray.first()] * 100).roundToInt().toString().appendPercent()
+                (output.first()[indexArray[0]] * 100).roundToInt().toString().appendPercent()
             val secondProbability =
                 (output.first()[indexArray[1]] * 100).roundToInt().toString().appendPercent()
             val thirdProbability =
@@ -165,9 +173,14 @@ class ComponentClassifierImpl @Inject constructor(
 
     private fun getMaxResultFromFloatArray(array: FloatArray): IntArray {
         val sortedArray = array.sortedDescending()
-        var indexArray = IntArray(3)
+        val indexMapper = hashMapOf<Float, Int>()
+        array.forEachIndexed {index, value ->
+            indexMapper[value] = index
+        }
+        //get the indices of the elements with the highest probability
+        val indexArray = IntArray(3)
         indexArray.forEachIndexed { index, _ ->
-            indexArray[index] = sortedArray.indexOf(sortedArray[index])
+            indexArray[index] = indexMapper[sortedArray[index]]!!
         }
         return indexArray
     }
