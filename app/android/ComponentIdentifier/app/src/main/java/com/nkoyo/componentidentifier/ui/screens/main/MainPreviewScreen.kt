@@ -251,7 +251,7 @@ fun MainPreviewScreen(
                     targetOffsetY = { -it })
             ) {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(top = 32.dp), contentAlignment =
+                    modifier = Modifier.fillMaxSize().padding(top = 16.dp), contentAlignment =
                     if (bottomSheetMinimized) Alignment.TopCenter else
                         Alignment.BottomCenter
                 ) {
@@ -259,6 +259,7 @@ fun MainPreviewScreen(
                         maxWidth = maxWidth,
                         maxHeight = maxHeight,
                         minimized = bottomSheetMinimized,
+                        testRecords = testRecords,
                         onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) }
                     )
                 }

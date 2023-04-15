@@ -119,10 +119,11 @@ fun StaticBottomSheet(
 
             Spacer(modifier = modifier.height(12.dp))
 
-            Column(modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                testRecords.forEach { testRecord ->
-                    TestRecordScreen(testRecord = testRecord)
-                }
+            testRecords.forEach { testRecord ->
+                TestRecordScreen(
+                    testRecord = testRecord,
+                    modifier = modifier.padding(horizontal = 16.dp, vertical = 2.dp),
+                )
             }
         } else {
             Box(

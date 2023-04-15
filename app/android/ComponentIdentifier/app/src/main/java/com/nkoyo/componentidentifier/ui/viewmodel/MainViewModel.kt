@@ -50,8 +50,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onTestRecordsChanged(records: List<TestRecord>) {
-        _testRecords.value.clear()
-        _testRecords.value.addAll(records)
+        _testRecords.value = records.toMutableList()
         Log.e(TAG, "onTestRecordsChanged: testRecords size is ${_testRecords.value.size}", )
     }
 
