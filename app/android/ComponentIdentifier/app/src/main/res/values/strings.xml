@@ -17,4 +17,5 @@
     <string name="prediction_three">Prediction 3</string>
     <string name="prediction_two">Prediction 2</string>
     <string name="probability_two">Probability 2</string>
+    <string name="scale_button">Scale Button</string>
 </resources>

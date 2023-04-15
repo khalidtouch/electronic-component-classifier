@@ -28,6 +28,7 @@ import javax.inject.Singleton
 import kotlin.math.roundToInt
 
 const val MODEL_FILENAME = "mobilenet_v2_fine_tuned2.tflite"
+const val MODEL_FILENAME_TEST = "mobilenet_v2_fine_tuned.tflite"
 const val LABEL_FILENAME = "labels.txt"
 
 @Singleton
@@ -45,7 +46,7 @@ class ComponentClassifierImpl @Inject constructor(
     override fun initialize() {
         try {
             val assetManager = context.assets
-            val model = loadModelFile(assetManager, MODEL_FILENAME) ?: return
+            val model = loadModelFile(assetManager, MODEL_FILENAME_TEST) ?: return
             labels = loadLabelData(context, LABEL_FILENAME)
             val compatibilityList = CompatibilityList()
             val options = Interpreter.Options().apply {
