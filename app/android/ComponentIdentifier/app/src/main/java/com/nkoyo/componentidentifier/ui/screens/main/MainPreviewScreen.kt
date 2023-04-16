@@ -238,7 +238,7 @@ fun MainPreviewScreen(
 
             //static bottom sheet
             AnimatedVisibility(
-                visible = true,
+                visible = cameraPermissionState.status.isGranted,
                 enter = slideInVertically(
                     animationSpec = tween(
                         durationMillis = 2,
