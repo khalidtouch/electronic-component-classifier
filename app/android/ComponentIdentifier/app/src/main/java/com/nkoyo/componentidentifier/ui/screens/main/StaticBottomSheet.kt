@@ -68,7 +68,7 @@ fun StaticBottomSheet(
                 probability = "classifiedResults[context.getString(R.string.prediction_three)].orEmpty()"
             ),
             TestRecord(
-                topic = context.getString(R.string.probability_two),
+                topic = context.getString(R.string.probability_three),
                 probability = "classifiedResults[context.getString(R.string.probability_two)].orEmpty()"
             ),
         )
