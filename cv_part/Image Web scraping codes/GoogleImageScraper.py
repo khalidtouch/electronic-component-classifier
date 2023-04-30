@@ -5,17 +5,17 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
+# from selenium.common.exceptions import NoSuchElementException
 
 #import helper libraries
 import time
-import urllib.request
+# import urllib.request
 from urllib.parse import urlparse
 import os
 import requests
 import io
 from PIL import Image
-import re
+# import re
 
 
 class GoogleImageScraper():
@@ -29,15 +29,14 @@ class GoogleImageScraper():
             print("[INFO] Image path not found. Creating a new folder.")
             os.makedirs(image_path)
             
-        webdriver_path = "C:\\Users\\admin\\Documents\\Python Scripts\\electronic-component-classifier\\cv_part\\Image Web scraping codes\\chromedriver.exe"
-            
+        webdriver_path = "C:\Users\admin\Documents\Python Scripts\electronic-component-classifier\cv_part\Image Web scraping codes\chromedriver.exe"
         for i in range(1):
             try:
                 #try going to www.google.com
                 options = Options()
                 if(headless):
                     options.add_argument('--headless')
-                driver = webdriver.Chrome(webdriver_path, chrome_options=options)
+                driver = webdriver.Chrome(executable_path = webdriver_path, chrome_options=options)
                 driver.set_window_size(1400,1050)
                 driver.get("https://www.google.com")
                 try:
@@ -45,12 +44,12 @@ class GoogleImageScraper():
                 except Exception as e:
                     continue
             except Exception as e:
-                continue
+                break
 
         self.driver = driver
         self.search_key = search_key
         self.number_of_images = number_of_images
-        self.webdriver_path = webdriver_path
+        # self.webdriver_path = webdriver_path
         self.image_path = image_path
         self.url = "https://www.google.com/search?q=%s&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947"%(search_key)
         self.headless=headless
