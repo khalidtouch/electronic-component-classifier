@@ -45,12 +45,7 @@ class GoogleImageScraper():
                 except Exception as e:
                     continue
             except Exception as e:
-                #update chromedriver
-                pattern = '(\d+\.\d+\.\d+\.\d+)'
-                version = list(set(re.findall(pattern, str(e))))[0]
-                is_patched = patch.download_lastest_chromedriver(version)
-                if (not is_patched):
-                    exit("[ERR] Please update the chromedriver.exe in the webdriver folder according to your chrome version:https://chromedriver.chromium.org/downloads")
+                continue
 
         self.driver = driver
         self.search_key = search_key
