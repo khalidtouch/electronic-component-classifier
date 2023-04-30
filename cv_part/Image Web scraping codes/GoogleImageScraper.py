@@ -19,7 +19,7 @@ import re
 
 
 class GoogleImageScraper():
-    def __init__(self, webdriver_path, image_path, search_key="cat", number_of_images=1, headless=True, min_resolution=(0, 0), max_resolution=(1920, 1080), max_missed=10):
+    def __init__(self, image_path, search_key="cat", number_of_images=1, headless=True, min_resolution=(0, 0), max_resolution=(1920, 1080), max_missed=10):
         #check parameter types
         image_path = os.path.join(image_path, search_key)
         if (type(number_of_images)!=int):
@@ -29,6 +29,7 @@ class GoogleImageScraper():
             print("[INFO] Image path not found. Creating a new folder.")
             os.makedirs(image_path)
             
+        webdriver_path = "C:\\Users\\admin\\Documents\\Python Scripts\\electronic-component-classifier\\cv_part\\Image Web scraping codes\\chromedriver.exe"
             
         for i in range(1):
             try:
