@@ -7,37 +7,38 @@ import time
 import os
 import hashlib
 
-DRIVER_PATH = "C:\Users\admin\Documents\Web scraping"
-wd = webdriver.Chrome(executable_path= DRIVER_PATH)
 
-def fetch_image_urls(query:str, max_links_to_fetch:int, wd:webdriver, sleep_between_interactions:int=5):
+DRIVER_PATH = "C:\\Users\\admin\\Documents\\Python Scripts\\electronic-component-classifier\\cv_part\\Image Web scraping codes\\chromedriver.exe"
+wd = webdriver.Chrome(DRIVER_PATH)
+
+def fetch_image_urls(max_img, wd, delay=1):
     def scroll_to_end(wd):
         wd.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(sleep_between_interactions)    
+        time.sleep(delay)    
     
     # build the google query
     search_url = "https://www.google.com/search?q=Capacitors&tbm=isch&ved=2ahUKEwiLpMvS98_-AhUfmycCHWpGAEEQ2-cCegQIABAA&oq=Capacitors&gs_lcp=CgNpbWcQAzIHCAAQigUQQzIHCAAQigUQQzIHCAAQigUQQzIHCAAQigUQQzIFCAAQgAQyBwgAEIoFEEMyBwgAEIoFEEMyBwgAEIoFEEMyBwgAEIoFEEMyBQgAEIAEUABYAGDNGmgBcAB4AIAB1QWIAdUFkgEDNi0xmAEAqgELZ3dzLXdpei1pbWfAAQE&sclient=img&ei=r35NZMuQJJ-2nsEP6oyBiAQ&bih=696&biw=1536"
 
     # load the page
-    wd.get(search_url.format(q=query))
+    wd.get(search_url)
 
     image_urls = set()
-    image_count = 0
+    image_count = len(image_urls)
     results_start = 0
-    while image_count < max_links_to_fetch:
+    while image_count < max_img:
         scroll_to_end(wd)
 
         # get all image thumbnail results
-        thumbnail_results = wd.find_element(By.CLASS_NAME, "iPVvYb")
-        number_results = len(thumbnail_results)
+        thumbnail = wd.find_element(By.CLASS_NAME, "r48jcc pT0Scc iPVvYb")
+        number_results = len(thumbnail)
         
         print(f"Found: {number_results} search results. Extracting links from {results_start}:{number_results}")
         
-        for img in thumbnail_results[results_start:number_results]:
+        for img in thumbnail[results_start: number_results]:
             # try to click every thumbnail such that we can get the real image behind it
             try:
                 img.click()
-                time.sleep(sleep_between_interactions)
+                time.sleep(delay)
             except Exception:
                 continue
 
@@ -46,24 +47,28 @@ def fetch_image_urls(query:str, max_links_to_fetch:int, wd:webdriver, sleep_betw
             for actual_image in actual_images:
                 if actual_image.get_attribute('src') and 'http' in actual_image.get_attribute('src'):
                     image_urls.add(actual_image.get_attribute('src'))
+                    print('Found Image!')
 
-            image_count = len(image_urls)
+            
 
-            if len(image_urls) >= max_links_to_fetch:
+            if len(image_urls) >= max_img:
                 print(f"Found: {len(image_urls)} image links, done!")
                 break
         else:
             print("Found:", len(image_urls), "image links, looking for more ...")
-            time.sleep(30)
-            return
-            load_more_button = wd.find_element(By.CSS_SELECTOR, "img.rg_i.Q4LuWd")
-            if load_more_button:
-                wd.execute_script("document.querySelector('img.rg_i.Q4LuWd').click();")
+            # time.sleep(1)
+            load_more_button = wd.find_element(By.CLASS_NAME, "Q4LuWd")
+            for image in load_more_button:
+                if image.get_attribute('src') and 'http' in image.get_attribute('src'):
+                    image_urls.add(actual_image.get_attribute('src'))
+                    print('Found more Images!')
 
         # move the result startpoint further down
-        results_start = len(thumbnail_results)
+        results_start = len(thumbnail)
 
     return image_urls
+
+
 
 
 def download_image(download_path,url):
