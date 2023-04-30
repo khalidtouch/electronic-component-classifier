@@ -1,20 +1,15 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Jul 18 13:01:02 2020
-
-@author: OHyic
-"""
 #import selenium drivers
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
+#from selenium.common.exceptions import NoSuchElementException
 
 #import helper libraries
 import time
-import urllib.request
+#import urllib.request
 from urllib.parse import urlparse
 import os
 import requests
@@ -53,7 +48,7 @@ class GoogleImageScraper():
                 driver.get("https://www.google.com")
                 try:
                     WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, "W0wltc"))).click()
-                except Exception as e:
+                except Exception:
                     continue
             except Exception as e:
                 #update chromedriver
