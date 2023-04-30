@@ -1,0 +1,24 @@
+Common Electronic Components
+
+1. Resistor
+2. Capacitor
+3. Switch
+4. Transistor
+5. Diode
+6. Inductor
+7. Light-emitting diode
+8. Transformer
+9. Battery
+10. Integrated Circuit
+11. Fuse
+12. Electric Relay
+13. Zener Diode
+14. Electric Motor
+15. Potentiometer
+16. Circuit Breaker
+17. MOSFET
+18. Variable Capacitor
+19. Field-effect transistor
+20. Photodiode
+21. Schottky diode
+22. Thermistor
