@@ -5,21 +5,23 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-# from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException
 
 #import helper libraries
 import time
-# import urllib.request
+import urllib.request
 from urllib.parse import urlparse
 import os
 import requests
 import io
 from PIL import Image
-# import re
+import re
 
+#custom patch libraries
+import patch
 
 class GoogleImageScraper():
-    def __init__(self, image_path, search_key="cat", number_of_images=1, headless=True, min_resolution=(0, 0), max_resolution=(1920, 1080), max_missed=10):
+    def __init__(self, image_path, webdriver_path = "C:\Users\admin\Documents\Python Scripts\Google-Image-Scraper\webdriver", search_key="cat", number_of_images=1, headless=True, min_resolution=(0, 0), max_resolution=(1920, 1080), max_missed=10):
         #check parameter types
         image_path = os.path.join(image_path, search_key)
         if (type(number_of_images)!=int):
@@ -29,14 +31,19 @@ class GoogleImageScraper():
             print("[INFO] Image path not found. Creating a new folder.")
             os.makedirs(image_path)
             
-        webdriver_path = "C:\Users\admin\Documents\Python Scripts\electronic-component-classifier\cv_part\Image Web scraping codes\chromedriver.exe"
+        #check if chromedriver is installed
+        if (not os.path.isfile(webdriver_path)):
+            is_patched = patch.download_lastest_chromedriver()
+            if (not is_patched):
+                exit("[ERR] Please update the chromedriver.exe in the webdriver folder according to your chrome version:https://chromedriver.chromium.org/downloads")
+
         for i in range(1):
             try:
                 #try going to www.google.com
                 options = Options()
                 if(headless):
                     options.add_argument('--headless')
-                driver = webdriver.Chrome(executable_path = webdriver_path, chrome_options=options)
+                driver = webdriver.Chrome(webdriver_path, chrome_options=options)
                 driver.set_window_size(1400,1050)
                 driver.get("https://www.google.com")
                 try:
@@ -44,12 +51,17 @@ class GoogleImageScraper():
                 except Exception as e:
                     continue
             except Exception as e:
-                break
+                #update chromedriver
+                pattern = '(\d+\.\d+\.\d+\.\d+)'
+                version = list(set(re.findall(pattern, str(e))))[0]
+                is_patched = patch.download_lastest_chromedriver(version)
+                if (not is_patched):
+                    exit("[ERR] Please update the chromedriver.exe in the webdriver folder according to your chrome version:https://chromedriver.chromium.org/downloads")
 
         self.driver = driver
         self.search_key = search_key
         self.number_of_images = number_of_images
-        # self.webdriver_path = webdriver_path
+        self.webdriver_path = webdriver_path
         self.image_path = image_path
         self.url = "https://www.google.com/search?q=%s&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947"%(search_key)
         self.headless=headless
@@ -190,3 +202,12 @@ class GoogleImageScraper():
                 pass
         print("--------------------------------------------------")
         print("[INFO] Downloads completed. Please note that some photos were not downloaded as they were not in the correct format (e.g. jpg, jpeg, png)")
+
+
+
+
+google_image_scraper = GoogleImageScraper(image_path = 'Cats')
+
+image_urls = google_image_scraper.find_image_urls()
+
+google_image_scraper.save_images(image_urls)
