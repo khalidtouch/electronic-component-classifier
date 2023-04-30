@@ -17,8 +17,6 @@ import io
 from PIL import Image
 import re
 
-#custom patch libraries
-import patch
 
 class GoogleImageScraper():
     def __init__(self, webdriver_path, image_path, search_key="cat", number_of_images=1, headless=True, min_resolution=(0, 0), max_resolution=(1920, 1080), max_missed=10):
@@ -31,12 +29,7 @@ class GoogleImageScraper():
             print("[INFO] Image path not found. Creating a new folder.")
             os.makedirs(image_path)
             
-        #check if chromedriver is installed
-        if (not os.path.isfile(webdriver_path)):
-            is_patched = patch.download_lastest_chromedriver()
-            if (not is_patched):
-                exit("[ERR] Please update the chromedriver.exe in the webdriver folder according to your chrome version:https://chromedriver.chromium.org/downloads")
-
+            
         for i in range(1):
             try:
                 #try going to www.google.com
