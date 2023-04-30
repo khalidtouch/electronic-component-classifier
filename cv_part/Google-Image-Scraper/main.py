@@ -28,14 +28,14 @@ if __name__ == "__main__":
     image_path = os.path.normpath(os.path.join(os.getcwd(), 'photos'))
 
     #Add new search key into array ["cat","t-shirt","apple","orange","pear","fish"]
-    search_keys = list(set(["Electric Wires","Power Cables"]))
+    search_keys = list(set(["getty images- Capacitors","Filament bulbs"]))
 
     #Parameters
-    number_of_images = 100                # Desired number of images
+    number_of_images = 300                # Desired number of images
     headless = True                     # True = No Chrome GUI
     min_resolution = (0, 0)             # Minimum desired image resolution
     max_resolution = (9999, 9999)       # Maximum desired image resolution
-    max_missed = 10                     # Max number of failed images before exit
+    max_missed = 20                     # Max number of failed images before exit
     number_of_workers = 1               # Number of "workers" used
     keep_filenames = False              # Keep original URL image filenames
 
