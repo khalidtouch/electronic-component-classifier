@@ -28,14 +28,10 @@ if __name__ == "__main__":
     image_path = os.path.normpath(os.path.join(os.getcwd(), 'photos'))
 
     #Add new search key into array ["cat","t-shirt","apple","orange","pear","fish"]
-    search_keys = list(set(["getty images Light-emitting diode", " Unsplash images Light-emitting diode", \
-                            "Burst images Light-emitting diode", "Pexels images Light-emitting diode", \
-                            "Pixabay images Light-emitting diode", "Free Images Light-emitting diode", \
-                            "Kaboompics Images Light-emitting diode", "Stocksnap Images Light-emitting diode", \
-                            "Flickr Images Light-emitting diode", "LEDs", "Light-emitting diode"]))
+    search_keys = list(set(["Transistor", "Transistors", "Silicon transistor", "Mosfet transistor"]))
 
     #Parameters
-    number_of_images = 1000             # Desired number of images
+    number_of_images = 2000             # Desired number of images
     headless = True                     # True = No Chrome GUI
     min_resolution = (0, 0)             # Minimum desired image resolution
     max_resolution = (9999, 9999)       # Maximum desired image resolution
