@@ -29,6 +29,7 @@ import com.nkoyo.componentidentifier.ui.components.CircleIconButton
 @Composable
 fun PhotoCaptureScreen (
     modifier: Modifier = Modifier,
+    rotationAngle: Float,
     onRemove: () -> Unit,
     imageUri: MutableState<Uri> = remember { mutableStateOf(Uri.parse("file://dev/null"))},
 ){
@@ -48,7 +49,8 @@ fun PhotoCaptureScreen (
                 modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter
             ){
                 RemoveSavedPhotoButton(
-                    onRemove = onRemove
+                    onRemove = onRemove,
+                    rotationAngle = rotationAngle,
                 )
             }
         }
@@ -59,8 +61,10 @@ fun PhotoCaptureScreen (
 @Composable
 fun RemoveSavedPhotoButton(
     modifier: Modifier = Modifier,
+    rotationAngle: Float,
     onRemove: () -> Unit,
 ) {
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -72,6 +76,8 @@ fun RemoveSavedPhotoButton(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CircleIconButton(
+            modifier = modifier,
+            rotationAngle = rotationAngle,
             icon = R.drawable.icon_close,
             contentDescription = stringResource(id = R.string.close),
             onClick = onRemove,

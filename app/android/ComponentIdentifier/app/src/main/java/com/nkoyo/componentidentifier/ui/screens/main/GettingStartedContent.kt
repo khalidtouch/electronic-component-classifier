@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +27,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -31,14 +36,15 @@ import com.nkoyo.componentidentifier.ui.components.SecondaryButton
 import com.nkoyo.componentidentifier.ui.components.TertiaryButton
 
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun GettingStartedContent(
     modifier: Modifier = Modifier,
     onGettingApplicationStarted: () -> Unit,
+    windowSizeClass: WindowSizeClass,
+    fullWidth: Dp,
     onAbort: () -> Unit = {},
 ) {
-    val message = buildAnnotatedString {
+    val valueMessage = buildAnnotatedString {
         append(
             "Now you can identify your electrical and electronic components using "
         )
@@ -52,14 +58,29 @@ fun GettingStartedContent(
     Surface(modifier = modifier) {
         Box(
             modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
+            contentAlignment = Alignment.Center
         ) {
             Card(
                 modifier = modifier
-                    .fillMaxWidth()
+                    .width(
+                        when (windowSizeClass.widthSizeClass) {
+                            WindowWidthSizeClass.Compact -> {
+                                fullWidth - 16.dp
+                            }
+
+                            WindowWidthSizeClass.Medium,
+                            WindowWidthSizeClass.Expanded -> {
+                                fullWidth - 300.dp
+                            }
+
+                            else -> fullWidth - 16.dp
+                        }
+                    )
                     .padding(
-                        vertical = 32.dp,
-                        horizontal = 8.dp
+                        top = 16.dp,
+                        bottom = 16.dp,
+                        start = 8.dp,
+                        end = 8.dp
                     ),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 2.dp,
@@ -80,7 +101,7 @@ fun GettingStartedContent(
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
-                            text = message,
+                            text = valueMessage,
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.outline,
                             maxLines = 5,

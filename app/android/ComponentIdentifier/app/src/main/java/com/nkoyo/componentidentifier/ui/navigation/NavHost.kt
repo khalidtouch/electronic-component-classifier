@@ -1,5 +1,6 @@
 package com.nkoyo.componentidentifier.ui.navigation
 
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -18,6 +19,7 @@ import com.nkoyo.componentidentifier.ui.screens.main.MainScreen
 @Composable
 fun NavHostWrapper(
     modifier: Modifier = Modifier,
+    windowSizeClass: WindowSizeClass,
     navController: NavHostController,
     onAbortApplication: () -> Unit,
     startDestination: String = Route.MainScreen
@@ -29,6 +31,7 @@ fun NavHostWrapper(
         composable(Route.MainScreen){
             MainScreen(
                 navController = navController,
+                windowSizeClass = windowSizeClass,
                 onAbortApplication = onAbortApplication
             )
         }

@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -122,13 +123,15 @@ fun CircleIconButton(
     tint: Color = MaterialTheme.colorScheme.outline,
     contentDescription: String,
     padding: Dp = 8.dp,
+    rotationAngle: Float,
     selected: Boolean = false,
 ) {
     Surface(
         modifier = modifier
             .size(32.dp)
             .clip(CircleShape)
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .rotate(rotationAngle),
         color = surfaceColor,
         shape = CircleShape,
         border = BorderStroke(
@@ -152,6 +155,7 @@ fun CircleIconButton(
 fun CameraFlipButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    rotationAngle: Float,
     color: Color = MaterialTheme.colorScheme.primary,
     tint: Color = MaterialTheme.colorScheme.outline,
 ) {
@@ -159,7 +163,8 @@ fun CameraFlipButton(
         modifier = modifier
             .size(32.dp)
             .clip(CircleShape)
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .rotate(rotationAngle),
         shape = CircleShape,
         color = color,
     ) {
@@ -178,6 +183,7 @@ fun CameraFlipButton(
 @Composable
 fun SnapshotButton(
     modifier: Modifier = Modifier,
+    rotationAngle: Float,
     onClick: () -> Unit = {},
     color: Color = MaterialTheme.colorScheme.primary,
     tint: Color = MaterialTheme.colorScheme.outline,
@@ -187,7 +193,9 @@ fun SnapshotButton(
             .size(68.dp)
             .padding(8.dp)
             .clip(CircleShape)
-            .clickable { onClick() }, shape = CircleShape,
+            .clickable { onClick() }
+            .rotate(rotationAngle)
+        , shape = CircleShape,
         color = Color.White,
         border = BorderStroke(
             width = 1.dp,
@@ -214,7 +222,9 @@ fun SnapshotButton(
 @Composable
 @Preview
 private fun SnapshotButtonPreview(){
-    SnapshotButton()
+    SnapshotButton(
+        rotationAngle = 23f,
+    )
 }
 
 
@@ -222,7 +232,8 @@ private fun SnapshotButtonPreview(){
 @Preview
 private fun CameraFlipButtonPreview(){
     CameraFlipButton(
-        onClick = {}
+        onClick = {},
+        rotationAngle = 23f,
     )
 }
 

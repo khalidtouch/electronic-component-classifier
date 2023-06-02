@@ -39,6 +39,7 @@ fun StaticBottomSheet(
     modifier: Modifier = Modifier,
     maxWidth: Dp,
     maxHeight: Dp,
+    rotationAngle: Float,
     context: Context = LocalContext.current,
     minimized: Boolean = false,
     onScale: () -> Unit = {},
@@ -111,6 +112,7 @@ fun StaticBottomSheet(
                     onClick = onScale,
                     surfaceColor = Color.Transparent,
                     borderColor = Color.Transparent,
+                    rotationAngle = rotationAngle,
                 )
             }
 
@@ -133,6 +135,7 @@ fun StaticBottomSheet(
                     onClick = onScale,
                     surfaceColor = Color.Transparent,
                     borderColor = Color.Transparent,
+                    rotationAngle = rotationAngle,
                 )
             }
         }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Component Identifier</string>
+    <string name="app_name">Nkoyo</string>
     <string name="permission_is_importantT">This permission is important for this app. Please grant the permission.</string>
     <string name="permission_is_important">Permission is important for this app. Please grant the permission.</string>
     <string name="flip_camera">Flip Camera</string>
