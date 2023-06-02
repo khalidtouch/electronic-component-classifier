@@ -5,7 +5,7 @@
 
     <style name="SplashScreenTheme" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@style/Theme.ComponentIdentifier</item>
-        <item name="windowSplashScreenBackground">@color/light_blue</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/baseline_search_24</item>
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/icon_camera</item>
     </style>
 </resources>

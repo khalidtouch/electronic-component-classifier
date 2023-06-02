@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -23,8 +24,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.ui.components.CircleIconButton
-import com.nkoyo.componentidentifier.ui.theme.LocalBlack
-import com.nkoyo.componentidentifier.ui.theme.LocalWhite
 
 
 @Composable
@@ -77,8 +76,8 @@ fun RemoveSavedPhotoButton(
             contentDescription = stringResource(id = R.string.close),
             onClick = onRemove,
             surfaceColor = Color.Transparent,
-            borderColor = LocalBlack,
-            tint = LocalBlack
+            borderColor = MaterialTheme.colorScheme.outline,
+            tint = MaterialTheme.colorScheme.outline
         )
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,18 +26,16 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.ui.components.SecondaryButton
 import com.nkoyo.componentidentifier.ui.components.TertiaryButton
-import com.nkoyo.componentidentifier.ui.theme.LocalBlack
 
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun PermissionNotAvailableContent(
+fun GettingStartedContent(
     modifier: Modifier = Modifier,
-    cameraPermissionState: PermissionState,
+    onGettingApplicationStarted: () -> Unit,
     onAbort: () -> Unit = {},
 ) {
     val message = buildAnnotatedString {
@@ -83,7 +82,7 @@ fun PermissionNotAvailableContent(
                         Text(
                             text = message,
                             fontSize = 14.sp,
-                            color = LocalBlack,
+                            color = MaterialTheme.colorScheme.outline,
                             maxLines = 5,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -103,7 +102,7 @@ fun PermissionNotAvailableContent(
 
                         SecondaryButton(
                             label = stringResource(id = R.string.get_started),
-                            onClick = { cameraPermissionState.launchPermissionRequest() }
+                            onClick = onGettingApplicationStarted,
                         )
                     }
                 }

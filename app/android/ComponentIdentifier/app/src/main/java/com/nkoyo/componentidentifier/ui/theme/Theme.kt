@@ -2,6 +2,7 @@ package com.nkoyo.componentidentifier.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -17,26 +18,61 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+@VisibleForTesting
+val LightColorScheme = lightColorScheme(
+    primary = Purple95,
+    onPrimary = Color.Black,
+    primaryContainer = Purple90,
+    onPrimaryContainer = Color.Black,
+    secondary = Orange40,
+    onSecondary = Color.White,
+    secondaryContainer = Orange40,
+    onSecondaryContainer = Color.White,
+    tertiary = GreenGray30,
+    onTertiary = Color.White,
+    tertiaryContainer = GreenGray50,
+    onTertiaryContainer = Color.White,
+    error = Red40,
+    onError = Color.White,
+    errorContainer = Red90,
+    onErrorContainer = Red10,
+    background = Color.White,
+    onBackground = Color.Black,
+    surface = Color.White,
+    onSurface = Color.Black,
+    surfaceVariant = Purple95,
+    onSurfaceVariant = Color.Black,
+    inverseSurface = Purple30,
+    inverseOnSurface = Color.White,
+    outline = Black,
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
+val DarkColorScheme = darkColorScheme(
+    primary = Purple95,
+    onPrimary = Color.Black,
+    primaryContainer = Purple90,
+    onPrimaryContainer = Color.Black,
+    secondary = Orange40,
     onSecondary = Color.White,
+    secondaryContainer = Orange40,
+    onSecondaryContainer = Color.White,
+    tertiary = GreenGray30,
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    tertiaryContainer = GreenGray50,
+    onTertiaryContainer = Color.White,
+    error = Red80,
+    onError = Red20,
+    errorContainer = Red30,
+    onErrorContainer = Red90,
+    background = DarkGreenGray10,
+    onBackground = Color.White,
+    surface = DarkGreenGray10,
+    onSurface = Color.White,
+    surfaceVariant = Purple95,
+    onSurfaceVariant = Color.Black,
+    inverseSurface = Purple30,
+    inverseOnSurface = Color.White,
+    outline = White,
 )
 
 @Composable
@@ -59,21 +95,22 @@ fun ComponentIdentifierTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            window.statusBarColor = colorScheme.outline.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
 
     val systemUiController = rememberSystemUiController()
+    val outlineColor = MaterialTheme.colorScheme.outline
     SideEffect {
         systemUiController.apply {
-            setStatusBarColor(color = LocalBlack)
+            setStatusBarColor(color = outlineColor)
         }
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = NkTypography,
         content = content
     )
 }

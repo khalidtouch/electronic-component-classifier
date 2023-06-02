@@ -10,8 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,10 +30,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.nkoyo.componentidentifier.R
-import com.nkoyo.componentidentifier.ui.theme.LocalBlack
-import com.nkoyo.componentidentifier.ui.theme.LocalGray
-import com.nkoyo.componentidentifier.ui.theme.LocalWhite
-import com.nkoyo.componentidentifier.ui.theme.LocalYellow
 
 @Composable
 fun SecondaryButton(
@@ -48,14 +43,14 @@ fun SecondaryButton(
         shape = CircleShape,
         border = BorderStroke(
             width = 1.dp,
-            color = LocalBlack,
+            color = MaterialTheme.colorScheme.outline,
         )
     ){
         Text(
             text = label,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            color = LocalBlack,
+            color = MaterialTheme.colorScheme.outline,
             modifier = modifier.padding(vertical = 8.dp, horizontal = 16.dp)
         )
     }
@@ -80,7 +75,7 @@ fun TertiaryButton(
             text = label,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            color = LocalBlack,
+            color = MaterialTheme.colorScheme.outline,
             modifier = modifier.padding(vertical = 8.dp, horizontal = 16.dp)
         )
     }
@@ -91,13 +86,14 @@ fun TertiaryButton(
 fun ShowRecordButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    color: Color = MaterialTheme.colorScheme.primary,
 ){
     Surface(
         modifier = modifier
             .size(36.dp)
             .clip(CircleShape)
             .clickable { onClick() },
-        color = LocalGray,
+        color = color,
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -121,9 +117,9 @@ fun CircleIconButton(
     onClick: () -> Unit = {},
     icon: Int,
     iconSize: Dp = 24.dp,
-    surfaceColor: Color = LocalWhite,
-    borderColor: Color = LocalBlack,
-    tint: Color = LocalBlack,
+    surfaceColor: Color = MaterialTheme.colorScheme.primary,
+    borderColor: Color = MaterialTheme.colorScheme.outline,
+    tint: Color = MaterialTheme.colorScheme.outline,
     contentDescription: String,
     padding: Dp = 8.dp,
     selected: Boolean = false,
@@ -136,7 +132,7 @@ fun CircleIconButton(
         color = surfaceColor,
         shape = CircleShape,
         border = BorderStroke(
-            1.5.dp, color =  if(selected) LocalYellow else borderColor,
+            1.5.dp, color =  if(selected) borderColor else borderColor.copy(0.5f),
         )
     ) {
         Icon(
@@ -146,7 +142,7 @@ fun CircleIconButton(
                 .size(iconSize)
                 .clip(CircleShape)
                 .padding(padding),
-            tint = if(selected) LocalYellow else tint,
+            tint = if(selected) tint else tint.copy(0.5f),
         )
     }
 }
@@ -156,6 +152,8 @@ fun CircleIconButton(
 fun CameraFlipButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    color: Color = MaterialTheme.colorScheme.primary,
+    tint: Color = MaterialTheme.colorScheme.outline,
 ) {
     Surface(
         modifier = modifier
@@ -163,7 +161,7 @@ fun CameraFlipButton(
             .clip(CircleShape)
             .clickable { onClick() },
         shape = CircleShape,
-        color = LocalGray,
+        color = color,
     ) {
         Icon(
             painter = painterResource(id = R.drawable.icon_flip),
@@ -171,7 +169,7 @@ fun CameraFlipButton(
             modifier = modifier
                 .size(24.dp)
                 .padding(8.dp),
-            tint = LocalWhite,
+            tint = tint,
         )
     }
 }
@@ -181,6 +179,8 @@ fun CameraFlipButton(
 fun SnapshotButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    color: Color = MaterialTheme.colorScheme.primary,
+    tint: Color = MaterialTheme.colorScheme.outline,
 ) {
     Surface(
         modifier = Modifier
@@ -191,7 +191,7 @@ fun SnapshotButton(
         color = Color.White,
         border = BorderStroke(
             width = 1.dp,
-            color = LocalBlack.copy(0.6f)
+            color = color.copy(0.6f)
         )
     ) {
         Box(
@@ -201,7 +201,7 @@ fun SnapshotButton(
                 .border(
                     BorderStroke(
                         width = 1.dp,
-                        color = LocalBlack.copy(0.6f)
+                        color = tint.copy(0.6f)
                     ),
                     shape = CircleShape,
                 )
