@@ -28,14 +28,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.ui.components.CircleIconButton
 import com.nkoyo.componentidentifier.ui.components.TestRecord
 import com.nkoyo.componentidentifier.ui.components.TestRecordScreen
-import com.nkoyo.componentidentifier.ui.theme.LocalBlack
-import com.nkoyo.componentidentifier.ui.theme.LocalGray
-import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
+
 
 @Composable
 fun StaticBottomSheet(
@@ -97,7 +94,7 @@ fun StaticBottomSheet(
                         .width(maxWidth.times(0.22f))
                         .height(4.dp)
                         .background(
-                            color = LocalBlack.copy(0.6f),
+                            color = MaterialTheme.colorScheme.outline.copy(0.6f),
                             shape = CircleShape
                         ),
                 )

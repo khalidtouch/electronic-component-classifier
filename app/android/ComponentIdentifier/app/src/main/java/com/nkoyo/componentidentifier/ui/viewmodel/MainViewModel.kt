@@ -25,8 +25,9 @@ class MainViewModel @Inject constructor(
     private val componentClassifier: ComponentClassifier
 ) : ViewModel() {
     val TAG = "MainViewModel"
+
     init {
-       initialize() //initialize Classifier
+        initialize() //initialize Classifier
     }
 
     private var _cameraSelector = MutableStateFlow(CameraSelector.DEFAULT_BACK_CAMERA)
@@ -45,13 +46,16 @@ class MainViewModel @Inject constructor(
     private var _bottomSheetMinimized = MutableStateFlow(false)
     val bottomSheetMinimized: StateFlow<Boolean> = _bottomSheetMinimized
 
+    private val _gettingStartedState = MutableStateFlow<Boolean>(true)
+    val gettingStartedState: StateFlow<Boolean> = _gettingStartedState
+
     fun onBottomSheetMinimizedChanged(minimized: Boolean) {
         _bottomSheetMinimized.value = minimized
     }
 
     fun onTestRecordsChanged(records: List<TestRecord>) {
         _testRecords.value = records.toMutableList()
-        Log.e(TAG, "onTestRecordsChanged: testRecords size is ${_testRecords.value.size}", )
+        Log.e(TAG, "onTestRecordsChanged: testRecords size is ${_testRecords.value.size}")
     }
 
     fun onCameraSelectorChanged(selector: CameraSelector) {
@@ -75,4 +79,7 @@ class MainViewModel @Inject constructor(
     fun close() = componentClassifier.close()
 
 
+    fun onApplicationStarted() {
+        _gettingStartedState.value = false
+    }
 }

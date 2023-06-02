@@ -11,11 +11,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,15 +22,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.ui.components.CameraFlipButton
 import com.nkoyo.componentidentifier.ui.components.CircleIconButton
 import com.nkoyo.componentidentifier.ui.components.ShowRecordButton
 import com.nkoyo.componentidentifier.ui.components.SnapshotButton
-import com.nkoyo.componentidentifier.ui.theme.LocalBlack
-import com.nkoyo.componentidentifier.ui.theme.LocalWhite
 
 
 @Composable
@@ -94,9 +89,9 @@ fun TopActionButtons(
             icon = R.drawable.icon_close,
             contentDescription = stringResource(id = R.string.close),
             onClick = onClose,
-            surfaceColor = LocalWhite,
-            borderColor = LocalWhite,
-            tint = LocalBlack
+            surfaceColor = MaterialTheme.colorScheme.primary,
+            borderColor = MaterialTheme.colorScheme.outline,
+            tint = MaterialTheme.colorScheme.outline
         )
 
         if(flashLightState !is ImageCaptureFlashMode.Off) {
@@ -105,8 +100,8 @@ fun TopActionButtons(
                 contentDescription = stringResource(id = R.string.toggle_flashlight),
                 onClick = onToggleFlashLight,
                 surfaceColor = Color.Transparent,
-                borderColor = LocalWhite,
-                tint = LocalWhite,
+                borderColor = MaterialTheme.colorScheme.outline,
+                tint = MaterialTheme.colorScheme.outline,
                 selected = flashLightState is ImageCaptureFlashMode.On,
             )
         } else {
@@ -116,14 +111,14 @@ fun TopActionButtons(
                     contentDescription = stringResource(id = R.string.toggle_flashlight),
                     onClick = onToggleFlashLight,
                     surfaceColor = Color.Transparent,
-                    borderColor = LocalWhite,
-                    tint = LocalWhite,
+                    borderColor = MaterialTheme.colorScheme.outline,
+                    tint = MaterialTheme.colorScheme.outline,
                 )
 
                 Icon(
                     painter = painterResource(id = R.drawable.icon_backslash),
                     contentDescription = stringResource(id = R.string.backslash),
-                    tint = LocalWhite,
+                    tint = MaterialTheme.colorScheme.outline,
                     modifier = modifier.size(24.dp)
                 )
             }
@@ -139,11 +134,12 @@ fun BottomActionButtons(
     onTakeSnapshot: () -> Unit = {},
     onToggleCamera: () -> Unit = {},
     onViewRecords: () -> Unit = {},
+    color: Color = MaterialTheme.colorScheme.outline
 ) {
     Surface(
         modifier = modifier,
         shape = CircleShape,
-        color = LocalBlack.copy(0.8f)
+        color = color.copy(0.8f)
     ) {
         Row(
             modifier = modifier

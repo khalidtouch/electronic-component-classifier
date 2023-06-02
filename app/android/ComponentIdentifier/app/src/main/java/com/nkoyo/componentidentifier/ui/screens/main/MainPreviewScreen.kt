@@ -9,18 +9,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,10 +25,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -44,13 +39,11 @@ import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.domain.extensions.executor
 import com.nkoyo.componentidentifier.domain.extensions.getCameraProvider
 import com.nkoyo.componentidentifier.domain.extensions.takeSnapshot
-import com.nkoyo.componentidentifier.domain.extensions.toBitmap2
 import com.nkoyo.componentidentifier.domain.usecases.CameraPreviewUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageAnalysisUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
 import com.nkoyo.componentidentifier.ui.components.TestRecord
-import com.nkoyo.componentidentifier.ui.theme.LocalBlack
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import java.io.File
@@ -68,10 +61,13 @@ fun MainPreviewScreen(
     cameraPermissionState: PermissionState = rememberPermissionState(
         android.Manifest.permission.CAMERA
     ),
-    permissionNotAvailableContent: @Composable () -> Unit = {
-        PermissionNotAvailableContent(
-            cameraPermissionState = cameraPermissionState,
-            onAbort = onAbortApplication
+    gettingStartedContent: @Composable () -> Unit = {
+        GettingStartedContent(
+            onAbort = onAbortApplication,
+            onGettingApplicationStarted = {
+                if (!cameraPermissionState.status.isGranted) cameraPermissionState.launchPermissionRequest()
+                mainViewModel.onApplicationStarted()
+            }
         )
     },
     content: @Composable (
@@ -98,6 +94,7 @@ fun MainPreviewScreen(
     val flashLightExecutor = mainViewModel.flashLightExecutor
     val testRecords by mainViewModel.testRecords.collectAsState()
     val bottomSheetMinimized by mainViewModel.bottomSheetMinimized.collectAsState()
+    val gettingStartedState by mainViewModel.gettingStartedState.collectAsStateWithLifecycle()
 
     val previewView: PreviewView = remember {
         val view = PreviewView(context).apply {
@@ -199,8 +196,8 @@ fun MainPreviewScreen(
                 modifier = Modifier.fillMaxSize()
             )
 
-            if (!cameraPermissionState.status.isGranted) {
-                permissionNotAvailableContent()
+            if (gettingStartedState) {
+                gettingStartedContent()
             } else {
                 content(
                     flashLightState = flashLightState,
@@ -251,7 +248,9 @@ fun MainPreviewScreen(
                     targetOffsetY = { -it })
             ) {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(top = 16.dp), contentAlignment =
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 16.dp), contentAlignment =
                     if (bottomSheetMinimized) Alignment.TopCenter else
                         Alignment.BottomCenter
                 ) {
