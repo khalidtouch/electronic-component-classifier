@@ -16,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -30,9 +31,11 @@ import com.nkoyo.componentidentifier.ui.components.ShowRecordButton
 import com.nkoyo.componentidentifier.ui.components.SnapshotButton
 
 
+
 @Composable
 fun MainPreviewScreenContent(
     modifier: Modifier = Modifier,
+    rotationAngle: Float,
     onClose: () -> Unit = {},
     onToggleFlashLight: () -> Unit = {},
     onTakeSnapshot: () -> Unit = {},
@@ -54,6 +57,7 @@ fun MainPreviewScreenContent(
                 onClose = onClose,
                 onToggleFlashLight = onToggleFlashLight,
                 flashLightState = flashLightState,
+                rotationAngle = rotationAngle,
             )
         }
 
@@ -63,6 +67,7 @@ fun MainPreviewScreenContent(
                 onTakeSnapshot = onTakeSnapshot,
                 onViewRecords = onViewRecords,
                 onToggleCamera = onToggleCamera,
+                rotationAngle = rotationAngle,
             )
         }
     }
@@ -72,6 +77,7 @@ fun MainPreviewScreenContent(
 fun TopActionButtons(
     modifier: Modifier = Modifier,
     onClose: () -> Unit,
+    rotationAngle: Float,
     onToggleFlashLight: () -> Unit,
     flashLightState: ImageCaptureFlashMode,
 ) {
@@ -86,6 +92,8 @@ fun TopActionButtons(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CircleIconButton(
+            modifier = modifier,
+            rotationAngle = rotationAngle,
             icon = R.drawable.icon_close,
             contentDescription = stringResource(id = R.string.close),
             onClick = onClose,
@@ -96,30 +104,35 @@ fun TopActionButtons(
 
         if(flashLightState !is ImageCaptureFlashMode.Off) {
             CircleIconButton(
+                modifier = modifier,
+                rotationAngle = rotationAngle,
                 icon = R.drawable.icon_lightning,
                 contentDescription = stringResource(id = R.string.toggle_flashlight),
                 onClick = onToggleFlashLight,
                 surfaceColor = Color.Transparent,
-                borderColor = MaterialTheme.colorScheme.outline,
-                tint = MaterialTheme.colorScheme.outline,
+                borderColor = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.primary,
                 selected = flashLightState is ImageCaptureFlashMode.On,
             )
         } else {
             Box(modifier = Modifier, contentAlignment = Alignment.Center){
                 CircleIconButton(
+                    modifier  = modifier,
+                    rotationAngle = rotationAngle,
                     icon = R.drawable.icon_lightning,
                     contentDescription = stringResource(id = R.string.toggle_flashlight),
                     onClick = onToggleFlashLight,
                     surfaceColor = Color.Transparent,
-                    borderColor = MaterialTheme.colorScheme.outline,
-                    tint = MaterialTheme.colorScheme.outline,
+                    borderColor = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.primary,
                 )
 
                 Icon(
                     painter = painterResource(id = R.drawable.icon_backslash),
                     contentDescription = stringResource(id = R.string.backslash),
-                    tint = MaterialTheme.colorScheme.outline,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = modifier.size(24.dp)
+                        .rotate(rotationAngle)
                 )
             }
         }
@@ -134,6 +147,7 @@ fun BottomActionButtons(
     onTakeSnapshot: () -> Unit = {},
     onToggleCamera: () -> Unit = {},
     onViewRecords: () -> Unit = {},
+    rotationAngle: Float,
     color: Color = MaterialTheme.colorScheme.outline
 ) {
     Surface(
@@ -149,15 +163,20 @@ fun BottomActionButtons(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ShowRecordButton(
-                onClick = onViewRecords
+                onClick = onViewRecords,
+                modifier = modifier,
             )
 
             SnapshotButton(
-                onClick = onTakeSnapshot
+                onClick = onTakeSnapshot,
+                rotationAngle = rotationAngle,
+                modifier = modifier,
             )
 
             CameraFlipButton(
-                onClick = onToggleCamera
+                onClick = onToggleCamera,
+                rotationAngle = rotationAngle,
+                modifier = modifier,
             )
         }
     }
@@ -168,6 +187,7 @@ fun BottomActionButtons(
 @Preview
 private fun BottomActionButtonsPreview() {
     BottomActionButtons(
-        parentWidth = 400.dp
+        parentWidth = 400.dp,
+        rotationAngle = 23f,
     )
 }

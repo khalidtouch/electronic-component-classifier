@@ -1,6 +1,7 @@
 package com.nkoyo.componentidentifier.ui.screens.main
 
 import android.util.Log
+import android.view.OrientationEventListener
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -14,17 +15,22 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,6 +60,7 @@ import java.lang.Exception
 @Composable
 fun MainPreviewScreen(
     modifier: Modifier = Modifier,
+    windowSizeClass: WindowSizeClass,
     mainViewModel: MainViewModel = hiltViewModel<MainViewModel>(),
     navController: NavHostController,
     onAbortApplication: () -> Unit = {},
@@ -61,13 +68,17 @@ fun MainPreviewScreen(
     cameraPermissionState: PermissionState = rememberPermissionState(
         android.Manifest.permission.CAMERA
     ),
-    gettingStartedContent: @Composable () -> Unit = {
+    gettingStartedContent: @Composable (
+        fullWidth: Dp,
+    ) -> Unit = { fullWidth ->
         GettingStartedContent(
             onAbort = onAbortApplication,
             onGettingApplicationStarted = {
                 if (!cameraPermissionState.status.isGranted) cameraPermissionState.launchPermissionRequest()
                 mainViewModel.onApplicationStarted()
-            }
+            },
+            fullWidth = fullWidth,
+            windowSizeClass = windowSizeClass,
         )
     },
     content: @Composable (
@@ -75,8 +86,10 @@ fun MainPreviewScreen(
         onToggleFlashLight: () -> Unit,
         onTakeSnapshot: () -> Unit,
         onToggleCamera: () -> Unit,
-    ) -> Unit = { flashlightState, onToggleFlashLight, onTakeSnapshot, onToggleCamera ->
+        rotationAngle: Float,
+    ) -> Unit = { flashlightState, onToggleFlashLight, onTakeSnapshot, onToggleCamera, rotationAngle ->
         MainPreviewScreenContent(
+            rotationAngle = rotationAngle,
             flashLightState = flashlightState,
             onToggleFlashLight = onToggleFlashLight,
             onTakeSnapshot = onTakeSnapshot,
@@ -87,6 +100,7 @@ fun MainPreviewScreen(
 ) {
     val TAG = "MainPreviewScreen"
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
     val coroutineScope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraSelector by mainViewModel.cameraSelector.collectAsState()
@@ -95,6 +109,7 @@ fun MainPreviewScreen(
     val testRecords by mainViewModel.testRecords.collectAsState()
     val bottomSheetMinimized by mainViewModel.bottomSheetMinimized.collectAsState()
     val gettingStartedState by mainViewModel.gettingStartedState.collectAsStateWithLifecycle()
+    var rotationAngle by remember { mutableStateOf(0f) }
 
     val previewView: PreviewView = remember {
         val view = PreviewView(context).apply {
@@ -107,12 +122,28 @@ fun MainPreviewScreen(
         view
     }
 
+    val orientationEventListener by lazy {
+        object : OrientationEventListener(context) {
+            override fun onOrientationChanged(orientation: Int) {
+                rotationAngle = orientation.toFloat()
+                Log.e(TAG, "onOrientationChanged: current orientation value is $orientation")
+            }
+
+        }
+    }
+
     val flashLightState by mainViewModel.flashLightState.collectAsState()
 
     val cameraPreviewUseCase = remember { mutableStateOf(CameraPreviewUseCase().of(previewView)) }
     val imageCaptureUseCase =
         remember(flashLightState) { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
     val imageAnalysisUseCase = remember { mutableStateOf(ImageAnalysisUseCase().of()) }
+
+    DisposableEffect(Unit) {
+        Log.e(TAG, "MainPreviewScreen: DiposableEffect has been called")
+        orientationEventListener.enable()
+        onDispose { orientationEventListener.disable() }
+    }
 
     LaunchedEffect(Unit, cameraPreviewUseCase.value, cameraSelector, flashLightState) {
         Log.e(TAG, "MainPreviewScreen: refresh camera use-case bindings")
@@ -197,10 +228,13 @@ fun MainPreviewScreen(
             )
 
             if (gettingStartedState) {
-                gettingStartedContent()
+                gettingStartedContent(
+                    fullWidth = configuration.screenWidthDp.dp,
+                )
             } else {
                 content(
                     flashLightState = flashLightState,
+                    rotationAngle = rotationAngle,
                     onToggleFlashLight = {
                         when (flashLightState) {
                             //  circular control
@@ -235,7 +269,7 @@ fun MainPreviewScreen(
 
             //static bottom sheet
             AnimatedVisibility(
-                visible = cameraPermissionState.status.isGranted,
+                visible = false,
                 enter = slideInVertically(
                     animationSpec = tween(
                         durationMillis = 2,
@@ -257,6 +291,7 @@ fun MainPreviewScreen(
                     StaticBottomSheet(
                         maxWidth = maxWidth,
                         maxHeight = maxHeight,
+                        rotationAngle = rotationAngle,
                         minimized = bottomSheetMinimized,
                         testRecords = testRecords,
                         onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) }
