@@ -122,22 +122,30 @@ fun MainPreviewScreen(
         view
     }
 
-    val orientationEventListener by lazy {
-        object : OrientationEventListener(context) {
-            override fun onOrientationChanged(orientation: Int) {
-                rotationAngle = orientation.toFloat()
-                Log.e(TAG, "onOrientationChanged: current orientation value is $orientation")
-            }
-
-        }
-    }
-
     val flashLightState by mainViewModel.flashLightState.collectAsState()
 
     val cameraPreviewUseCase = remember { mutableStateOf(CameraPreviewUseCase().of(previewView)) }
     val imageCaptureUseCase =
         remember(flashLightState) { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
     val imageAnalysisUseCase = remember { mutableStateOf(ImageAnalysisUseCase().of()) }
+
+    val orientationEventListener by lazy {
+        object : OrientationEventListener(context) {
+            override fun onOrientationChanged(orientation: Int) {
+                rotationAngle = orientation.toFloat()
+                val cameraRotation = when(orientation) {
+                    in 45 until 135 -> android.view.Surface.ROTATION_270
+                    in 135 until 225 -> android.view.Surface.ROTATION_180
+                    in 225 until 315 -> android.view.Surface.ROTATION_90
+                    else -> android.view.Surface.ROTATION_0
+                }
+                imageAnalysisUseCase.value.targetRotation = cameraRotation
+                imageCaptureUseCase.value.targetRotation = cameraRotation
+                Log.e(TAG, "onOrientationChanged: current orientation value is $orientation")
+            }
+
+        }
+    }
 
     DisposableEffect(Unit) {
         Log.e(TAG, "MainPreviewScreen: DiposableEffect has been called")
