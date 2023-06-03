@@ -1,8 +1,15 @@
 package com.nkoyo.componentidentifier.ui.screens.main
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.graphics.Paint
+import android.graphics.Point
+import android.os.Build
 import android.util.Log
+import android.util.Size
 import android.view.OrientationEventListener
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.view.PreviewView
@@ -10,11 +17,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -24,9 +34,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -41,6 +56,8 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.objects.ObjectDetector
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.domain.extensions.executor
 import com.nkoyo.componentidentifier.domain.extensions.getCameraProvider
@@ -51,11 +68,15 @@ import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
 import com.nkoyo.componentidentifier.ui.components.TestRecord
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
+import com.nkoyo.componentidentifier.ui.viewmodel.ObjectBoundingBox
+import com.nkoyo.componentidentifier.ui.viewmodel.asBitmap
 import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.Exception
 
 
+@SuppressLint("UnsafeOptInUsageError")
+@RequiresApi(Build.VERSION_CODES.R)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainPreviewScreen(
@@ -66,7 +87,7 @@ fun MainPreviewScreen(
     onAbortApplication: () -> Unit = {},
     onSavePhotoFile: (File) -> Unit = {},
     cameraPermissionState: PermissionState = rememberPermissionState(
-        android.Manifest.permission.CAMERA
+        Manifest.permission.CAMERA
     ),
     gettingStartedContent: @Composable (
         fullWidth: Dp,
@@ -103,13 +124,14 @@ fun MainPreviewScreen(
     val configuration = LocalConfiguration.current
     val coroutineScope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
-    val cameraSelector by mainViewModel.cameraSelector.collectAsState()
+    val cameraSelector = mainViewModel.cameraSelector
     val cameraExecutor = mainViewModel.cameraExecutor
     val flashLightExecutor = mainViewModel.flashLightExecutor
     val testRecords by mainViewModel.testRecords.collectAsState()
     val bottomSheetMinimized by mainViewModel.bottomSheetMinimized.collectAsState()
     val gettingStartedState by mainViewModel.gettingStartedState.collectAsStateWithLifecycle()
     var rotationAngle by remember { mutableStateOf(0f) }
+    val objectBoundingBoxes by mainViewModel.objectBoundingBoxes.collectAsStateWithLifecycle()
 
     val previewView: PreviewView = remember {
         val view = PreviewView(context).apply {
@@ -123,17 +145,19 @@ fun MainPreviewScreen(
     }
 
     val flashLightState by mainViewModel.flashLightState.collectAsState()
-
+    val point = Point()
+    val size = context.display?.getCurrentSizeRange(point, point)
     val cameraPreviewUseCase = remember { mutableStateOf(CameraPreviewUseCase().of(previewView)) }
     val imageCaptureUseCase =
         remember(flashLightState) { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
-    val imageAnalysisUseCase = remember { mutableStateOf(ImageAnalysisUseCase().of()) }
+    val imageAnalysisUseCase =
+        remember { mutableStateOf(ImageAnalysisUseCase().of(Size(point.x, point.y))) }
 
     val orientationEventListener by lazy {
         object : OrientationEventListener(context) {
             override fun onOrientationChanged(orientation: Int) {
                 rotationAngle = orientation.toFloat()
-                val cameraRotation = when(orientation) {
+                val cameraRotation = when (orientation) {
                     in 45 until 135 -> android.view.Surface.ROTATION_270
                     in 135 until 225 -> android.view.Surface.ROTATION_180
                     in 225 until 315 -> android.view.Surface.ROTATION_90
@@ -141,7 +165,6 @@ fun MainPreviewScreen(
                 }
                 imageAnalysisUseCase.value.targetRotation = cameraRotation
                 imageCaptureUseCase.value.targetRotation = cameraRotation
-                Log.e(TAG, "onOrientationChanged: current orientation value is $orientation")
             }
 
         }
@@ -160,13 +183,9 @@ fun MainPreviewScreen(
         imageAnalysisUseCase.value.setAnalyzer(
             cameraExecutor,
             ImageAnalysis.Analyzer { imageProxy ->
-                Log.e(TAG, "MainPreviewScreen: image is being analyzed")
                 val generatedBitmap = imageProxy.toBitmap() ?: return@Analyzer
+                /**
                 val classifiedResults = mainViewModel.classify(generatedBitmap)
-                Log.e(
-                    TAG,
-                    "MainPreviewScreen: the classified results are : ${classifiedResults.toString()}"
-                )
                 mainViewModel.onTestRecordsChanged(
                     listOf(
                         TestRecord(
@@ -196,8 +215,20 @@ fun MainPreviewScreen(
                     )
                 )
 
-                imageProxy.close()
-                Log.e(TAG, "MainPreviewScreen: testRecord size is ${testRecords.size}")
+                */
+
+                val rotationDegrees = imageProxy.imageInfo.rotationDegrees
+                mainViewModel.runObjectDetection(
+                    bitmap = generatedBitmap,
+                    rotationDegrees = rotationDegrees,
+                    onSuccess = {
+                        Log.e(TAG, "MainPreviewScreen: number of detected objects is ${it.size}")
+                        imageProxy.close()
+                    },
+                    onFailure = {
+                        imageProxy.close()
+                    }
+                )
             })
 
         try {
@@ -266,13 +297,50 @@ fun MainPreviewScreen(
                         }
                     },
                     onToggleCamera = {
-                        if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
-                            mainViewModel.onCameraSelectorChanged(CameraSelector.DEFAULT_FRONT_CAMERA)
-                        } else {
-                            mainViewModel.onCameraSelectorChanged(CameraSelector.DEFAULT_BACK_CAMERA)
-                        }
+                     //TODO()
                     }
                 )
+
+                Box(Modifier.fillMaxSize()) {
+                    val boxBorderColor = MaterialTheme.colorScheme.secondary
+
+                    Canvas(modifier = Modifier, onDraw = {
+                        drawRect(
+                            color = boxBorderColor,
+                            style = Stroke(width = 2.dp.toPx()),
+                            size = this.size.copy(
+                                width = 430f,
+                                height = 430f,
+                            ),
+                            topLeft = Offset(
+                                x = 0f,
+                                y = 0f,
+                            )
+                        )
+                    })
+
+                    Log.e(
+                        TAG,
+                        "MainPreviewScreen: number of items detected ${objectBoundingBoxes.size}"
+                    )
+                    //bounding boxes
+                    objectBoundingBoxes.forEachIndexed { _, objectBoundingBox ->
+                        val boxSize = androidx.compose.ui.geometry.Size(
+                            objectBoundingBox.box.width().toFloat(),
+                            objectBoundingBox.box.height().toFloat()
+                        )
+                        Canvas(modifier = Modifier, onDraw = {
+                            drawRect(
+                                color = boxBorderColor,
+                                size = boxSize,
+                                topLeft = Offset(
+                                    x = objectBoundingBox.box.left.toFloat(),
+                                    y = objectBoundingBox.box.top.toFloat(),
+                                )
+                            )
+                        })
+                    }
+                }
             }
 
             //static bottom sheet
