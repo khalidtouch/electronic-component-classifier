@@ -3,11 +3,23 @@ package com.nkoyo.componentidentifier.ui.viewmodel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageFormat
+import android.graphics.Rect
+import android.graphics.YuvImage
+import android.media.Image
 import android.util.Log
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.PreviewView
 import androidx.lifecycle.ViewModel
+import com.google.mlkit.common.model.LocalModel
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.objects.DetectedObject
+import com.google.mlkit.vision.objects.ObjectDetection
+import com.google.mlkit.vision.objects.ObjectDetector
+import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
+import com.nkoyo.componentidentifier.data.classifier.MODEL_FILENAME_TEST
 import com.nkoyo.componentidentifier.domain.classifier.ComponentClassifier
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.ui.components.TestRecord
@@ -15,6 +27,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.io.ByteArrayOutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -30,8 +43,8 @@ class MainViewModel @Inject constructor(
         initialize() //initialize Classifier
     }
 
-    private var _cameraSelector = MutableStateFlow(CameraSelector.DEFAULT_BACK_CAMERA)
-    val cameraSelector: StateFlow<CameraSelector> = _cameraSelector
+    val cameraSelector: CameraSelector = CameraSelector.Builder()
+        .requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
 
     private var _flashLightState =
         MutableStateFlow(ImageCaptureFlashMode.Auto as ImageCaptureFlashMode)
@@ -49,6 +62,10 @@ class MainViewModel @Inject constructor(
     private val _gettingStartedState = MutableStateFlow<Boolean>(true)
     val gettingStartedState: StateFlow<Boolean> = _gettingStartedState
 
+
+    private val _objectBoundingBoxes = MutableStateFlow<ArrayList<ObjectBoundingBox>>(arrayListOf())
+    val objectBoundingBoxes: StateFlow<ArrayList<ObjectBoundingBox>> = _objectBoundingBoxes
+
     fun onBottomSheetMinimizedChanged(minimized: Boolean) {
         _bottomSheetMinimized.value = minimized
     }
@@ -58,8 +75,8 @@ class MainViewModel @Inject constructor(
         Log.e(TAG, "onTestRecordsChanged: testRecords size is ${_testRecords.value.size}")
     }
 
-    fun onCameraSelectorChanged(selector: CameraSelector) {
-        _cameraSelector.value = selector
+    private fun onCameraSelectorChanged(selector: CameraSelector) {
+        // _cameraSelector.value = selector
     }
 
     fun onFlashLightStateChanged(state: ImageCaptureFlashMode) {
@@ -74,7 +91,29 @@ class MainViewModel @Inject constructor(
         return componentClassifier.loadLabelData(context, filename)
     }
 
-    fun initialize() = componentClassifier.initialize()
+    private fun initialize() = componentClassifier.initialize()
+
+    fun runObjectDetection(
+        bitmap: Bitmap?,
+        rotationDegrees: Int,
+        onSuccess: ObjectDetectionSuccessListener,
+        onFailure: ObjectDetectionFailureListener,
+    ) {
+        val model = "obj_detection_sample_1.tflite"
+        //val model = "object_detection_mobile_google.tflite"
+        if (bitmap == null) return
+        val localModel = LocalModel.Builder()
+            .setAssetFilePath(MODEL_FILENAME_TEST).build()
+        val options = CustomObjectDetectorOptions.Builder(localModel)
+            .setDetectorMode(CustomObjectDetectorOptions.SINGLE_IMAGE_MODE)
+            .enableMultipleObjects()
+            .enableClassification()
+            .build()
+        val detector = ObjectDetection.getClient(options)
+        val inputImage = InputImage.fromBitmap(bitmap, rotationDegrees)
+        detector.process(inputImage).addOnSuccessListener(onSuccess)
+            .addOnFailureListener(onFailure)
+    }
 
     fun close() = componentClassifier.close()
 
@@ -82,4 +121,49 @@ class MainViewModel @Inject constructor(
     fun onApplicationStarted() {
         _gettingStartedState.value = false
     }
+
+    fun addToObjectBoundingBoxes(objectBoundingBox: ObjectBoundingBox) {
+        if (_objectBoundingBoxes.value.find { it.box == objectBoundingBox.box || it.text == objectBoundingBox.text } != null)
+            _objectBoundingBoxes.value.remove(objectBoundingBox)
+        _objectBoundingBoxes.value.add(objectBoundingBox)
+    }
+
+    fun removeFromObjectBoundingBoxes(objectBoundingBox: ObjectBoundingBox) {
+        _objectBoundingBoxes.value.remove(objectBoundingBox)
+    }
+
+    fun clearObjectBoundingBoxes() {
+        _objectBoundingBoxes.value.clear()
+    }
+}
+
+data class ObjectBoundingBox(
+    val text: String,
+    val box: Rect,
+)
+
+typealias ObjectDetectionSuccessListener = (List<DetectedObject>) -> Unit
+typealias ObjectDetectionFailureListener = (Exception) -> Unit
+
+fun Image?.asBitmap(): Bitmap? {
+    if (this == null) return null
+    if (this.format != ImageFormat.YUV_420_888) return null
+    val yBuffer = this.planes?.get(0)?.buffer ?: return null //Y
+    val vuBuffer = this.planes?.get(2)?.buffer ?: return null  //VU
+
+    val ySize = yBuffer.remaining()
+    val vuSize = vuBuffer.remaining()
+
+    val nv21 = ByteArray(ySize + vuSize)
+    yBuffer.get(nv21, 0, ySize)
+    vuBuffer.get(nv21, ySize, vuSize)
+
+    val yuvImage = YuvImage(nv21, ImageFormat.NV21, this.width, this.height, null)
+    val outStream = ByteArrayOutputStream()
+    yuvImage.compressToJpeg(
+        Rect(0, 0, yuvImage.width, yuvImage.height),
+        50, outStream
+    )
+    val imageBytes = outStream.toByteArray()
+    return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 }
