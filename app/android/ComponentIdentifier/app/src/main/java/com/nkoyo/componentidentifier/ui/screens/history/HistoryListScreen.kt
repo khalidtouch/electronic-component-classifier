@@ -44,7 +44,7 @@ fun HistoryListScreen(
         Modifier.padding(
             start = 16.dp,
             end = 16.dp,
-            top = 16.dp,
+            top = 32.dp,
             bottom = 16.dp,
         )
     ) {

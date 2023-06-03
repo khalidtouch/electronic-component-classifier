@@ -22,4 +22,7 @@
     <string name="developer_name">Inuikim Nkoyo</string>
     <string name="mat_no">18ck024212</string>
     <string name="developer_location">Developed in Convenant University, Nigeria.</string>
+    <string name="options">options</string>
+    <string name="records">Records</string>
+    <string name="search_records">Search Records</string>
 </resources>

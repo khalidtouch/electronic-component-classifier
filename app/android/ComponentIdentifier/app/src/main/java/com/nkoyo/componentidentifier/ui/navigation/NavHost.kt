@@ -49,6 +49,10 @@ fun NavHostWrapper(
             HistoryScreen(
                 mainViewModel = mainViewModel,
                 windowSizeClass = windowSizeClass,
+                onBackPressed = { navController.navigate(Route.MainScreen) },
+                onStartSearch = {},
+                onOptionsPressed = {},
+                onHistoryDetails = { navController.navigate(Route.HistoryDetailScreen) }
             )
         }
 
