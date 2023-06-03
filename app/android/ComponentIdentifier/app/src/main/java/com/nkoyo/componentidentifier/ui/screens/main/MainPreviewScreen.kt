@@ -68,8 +68,6 @@ import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
 import com.nkoyo.componentidentifier.ui.components.TestRecord
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
-import com.nkoyo.componentidentifier.ui.viewmodel.ObjectBoundingBox
-import com.nkoyo.componentidentifier.ui.viewmodel.asBitmap
 import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.Exception
@@ -184,7 +182,6 @@ fun MainPreviewScreen(
             cameraExecutor,
             ImageAnalysis.Analyzer { imageProxy ->
                 val generatedBitmap = imageProxy.toBitmap() ?: return@Analyzer
-                /**
                 val classifiedResults = mainViewModel.classify(generatedBitmap)
                 mainViewModel.onTestRecordsChanged(
                     listOf(
@@ -214,21 +211,7 @@ fun MainPreviewScreen(
                         ),
                     )
                 )
-
-                */
-
-                val rotationDegrees = imageProxy.imageInfo.rotationDegrees
-                mainViewModel.runObjectDetection(
-                    bitmap = generatedBitmap,
-                    rotationDegrees = rotationDegrees,
-                    onSuccess = {
-                        Log.e(TAG, "MainPreviewScreen: number of detected objects is ${it.size}")
-                        imageProxy.close()
-                    },
-                    onFailure = {
-                        imageProxy.close()
-                    }
-                )
+                imageProxy.close()
             })
 
         try {
@@ -300,47 +283,6 @@ fun MainPreviewScreen(
                      //TODO()
                     }
                 )
-
-                Box(Modifier.fillMaxSize()) {
-                    val boxBorderColor = MaterialTheme.colorScheme.secondary
-
-                    Canvas(modifier = Modifier, onDraw = {
-                        drawRect(
-                            color = boxBorderColor,
-                            style = Stroke(width = 2.dp.toPx()),
-                            size = this.size.copy(
-                                width = 430f,
-                                height = 430f,
-                            ),
-                            topLeft = Offset(
-                                x = 0f,
-                                y = 0f,
-                            )
-                        )
-                    })
-
-                    Log.e(
-                        TAG,
-                        "MainPreviewScreen: number of items detected ${objectBoundingBoxes.size}"
-                    )
-                    //bounding boxes
-                    objectBoundingBoxes.forEachIndexed { _, objectBoundingBox ->
-                        val boxSize = androidx.compose.ui.geometry.Size(
-                            objectBoundingBox.box.width().toFloat(),
-                            objectBoundingBox.box.height().toFloat()
-                        )
-                        Canvas(modifier = Modifier, onDraw = {
-                            drawRect(
-                                color = boxBorderColor,
-                                size = boxSize,
-                                topLeft = Offset(
-                                    x = objectBoundingBox.box.left.toFloat(),
-                                    y = objectBoundingBox.box.top.toFloat(),
-                                )
-                            )
-                        })
-                    }
-                }
             }
 
             //static bottom sheet

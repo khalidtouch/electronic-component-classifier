@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -89,42 +91,64 @@ fun GettingStartedContent(
                     hoveredElevation = 0.dp,
                 )
             ) {
-                Column(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
-                ) {
-                    Box(
-                        modifier = modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterStart
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onPrimary) {
+                    Column(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.Top
                     ) {
+                        //developer
                         Text(
-                            text = valueMessage,
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.outline,
-                            maxLines = 5,
-                            overflow = TextOverflow.Ellipsis,
+                            text = stringResource(id = R.string.developer_name),
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontWeight = FontWeight.ExtraBold,
+                            )
                         )
-                    }
-
-                    Spacer(modifier = modifier.height(32.dp))
-
-                    Row(
-                        modifier = modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        TertiaryButton(
-                            label = stringResource(id = R.string.abort),
-                            onClick = onAbort,
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(id = R.string.mat_no),
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                            )
                         )
-
-                        SecondaryButton(
-                            label = stringResource(id = R.string.get_started),
-                            onClick = onGettingApplicationStarted,
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(id = R.string.developer_location),
+                            style = MaterialTheme.typography.bodyLarge
                         )
+                        Spacer(Modifier.height(72.dp))
+                        Box(
+                            modifier = modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Text(
+                                text = valueMessage,
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+
+                        Spacer(modifier = modifier.height(52.dp))
+
+                        Row(
+                            modifier = modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            TertiaryButton(
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                label = stringResource(id = R.string.abort),
+                                onClick = onAbort,
+                            )
+
+                            SecondaryButton(
+                                containerColor = MaterialTheme.colorScheme.onPrimary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                label = stringResource(id = R.string.get_started),
+                                onClick = onGettingApplicationStarted,
+                            )
+                        }
                     }
                 }
             }

@@ -144,26 +144,3 @@ data class ObjectBoundingBox(
 
 typealias ObjectDetectionSuccessListener = (List<DetectedObject>) -> Unit
 typealias ObjectDetectionFailureListener = (Exception) -> Unit
-
-fun Image?.asBitmap(): Bitmap? {
-    if (this == null) return null
-    if (this.format != ImageFormat.YUV_420_888) return null
-    val yBuffer = this.planes?.get(0)?.buffer ?: return null //Y
-    val vuBuffer = this.planes?.get(2)?.buffer ?: return null  //VU
-
-    val ySize = yBuffer.remaining()
-    val vuSize = vuBuffer.remaining()
-
-    val nv21 = ByteArray(ySize + vuSize)
-    yBuffer.get(nv21, 0, ySize)
-    vuBuffer.get(nv21, ySize, vuSize)
-
-    val yuvImage = YuvImage(nv21, ImageFormat.NV21, this.width, this.height, null)
-    val outStream = ByteArrayOutputStream()
-    yuvImage.compressToJpeg(
-        Rect(0, 0, yuvImage.width, yuvImage.height),
-        50, outStream
-    )
-    val imageBytes = outStream.toByteArray()
-    return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-}
