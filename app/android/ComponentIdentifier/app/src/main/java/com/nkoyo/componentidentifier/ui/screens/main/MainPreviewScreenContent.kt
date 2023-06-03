@@ -1,9 +1,16 @@
 package com.nkoyo.componentidentifier.ui.screens.main
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +20,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,44 +40,75 @@ import com.nkoyo.componentidentifier.ui.components.ShowRecordButton
 import com.nkoyo.componentidentifier.ui.components.SnapshotButton
 
 
-
 @Composable
 fun MainPreviewScreenContent(
     modifier: Modifier = Modifier,
     rotationAngle: Float,
+    gettingStartedState: Boolean,
+    windowSizeClass: WindowSizeClass,
     onClose: () -> Unit = {},
     onToggleFlashLight: () -> Unit = {},
     onTakeSnapshot: () -> Unit = {},
     onToggleCamera: () -> Unit = {},
     onViewRecords: () -> Unit = {},
     flashLightState: ImageCaptureFlashMode,
+    bottomSheet: @Composable () -> Unit,
 ) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 32.dp),
+            .padding(bottom = 32.dp, top = 16.dp),
         contentAlignment = Alignment.TopCenter,
     ) {
         val parentWidth = maxWidth
-        Box(
-            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter
-        ) {
-            TopActionButtons(
-                onClose = onClose,
-                onToggleFlashLight = onToggleFlashLight,
-                flashLightState = flashLightState,
-                rotationAngle = rotationAngle,
-            )
-        }
+        Row(Modifier.matchParentSize()) {
+            if(!gettingStartedState) {
+                Box(Modifier.weight(1f)) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter
+                    ) {
+                        TopActionButtons(
+                            onClose = onClose,
+                            onToggleFlashLight = onToggleFlashLight,
+                            flashLightState = flashLightState,
+                            rotationAngle = rotationAngle,
+                        )
+                    }
 
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-            BottomActionButtons(
-                parentWidth = parentWidth,
-                onTakeSnapshot = onTakeSnapshot,
-                onViewRecords = onViewRecords,
-                onToggleCamera = onToggleCamera,
-                rotationAngle = rotationAngle,
-            )
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+                        BottomActionButtons(
+                            parentWidth = parentWidth,
+                            onTakeSnapshot = onTakeSnapshot,
+                            onViewRecords = onViewRecords,
+                            onToggleCamera = onToggleCamera,
+                            rotationAngle = rotationAngle,
+                        )
+                    }
+                }
+            }
+            if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact) {
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = !gettingStartedState,
+                    enter = slideInHorizontally(
+                        animationSpec = tween(
+                            durationMillis = 200,
+                            delayMillis = 2,
+                        ),
+                        initialOffsetX = { -it }
+                    ),
+                    exit = slideOutHorizontally(
+                        animationSpec = tween(durationMillis = 2),
+                        targetOffsetX = { -it })
+                ) {
+                    Box(
+                        Modifier
+                            .width(parentWidth.times(0.3f))
+                            .fillMaxHeight()
+                    ) {
+                        bottomSheet()
+                    }
+                }
+            }
         }
     }
 }
@@ -85,7 +125,6 @@ fun TopActionButtons(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                vertical = 16.dp,
                 horizontal = 16.dp
             ),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -102,7 +141,7 @@ fun TopActionButtons(
             tint = MaterialTheme.colorScheme.outline
         )
 
-        if(flashLightState !is ImageCaptureFlashMode.Off) {
+        if (flashLightState !is ImageCaptureFlashMode.Off) {
             CircleIconButton(
                 modifier = modifier,
                 rotationAngle = rotationAngle,
@@ -115,9 +154,9 @@ fun TopActionButtons(
                 selected = flashLightState is ImageCaptureFlashMode.On,
             )
         } else {
-            Box(modifier = Modifier, contentAlignment = Alignment.Center){
+            Box(modifier = Modifier, contentAlignment = Alignment.Center) {
                 CircleIconButton(
-                    modifier  = modifier,
+                    modifier = modifier,
                     rotationAngle = rotationAngle,
                     icon = R.drawable.icon_lightning,
                     contentDescription = stringResource(id = R.string.toggle_flashlight),
@@ -131,7 +170,8 @@ fun TopActionButtons(
                     painter = painterResource(id = R.drawable.icon_backslash),
                     contentDescription = stringResource(id = R.string.backslash),
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = modifier.size(24.dp)
+                    modifier = modifier
+                        .size(24.dp)
                         .rotate(rotationAngle)
                 )
             }

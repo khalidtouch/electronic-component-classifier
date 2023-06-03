@@ -19,6 +19,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,6 +41,7 @@ fun StaticBottomSheet(
     modifier: Modifier = Modifier,
     maxWidth: Dp,
     maxHeight: Dp,
+    windowSizeClass: WindowSizeClass,
     rotationAngle: Float,
     context: Context = LocalContext.current,
     minimized: Boolean = false,
@@ -71,7 +74,10 @@ fun StaticBottomSheet(
             ),
         )
 ) {
-    val height by  animateDpAsState(targetValue = if (minimized) 32.dp else maxHeight.times(0.4f))
+    val calculatedHeight = if(windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
+        maxHeight.times(0.4f)
+    } else maxHeight
+    val height by  animateDpAsState(targetValue = if (minimized) 32.dp else calculatedHeight)
     val width by animateDpAsState(targetValue = if (minimized) maxWidth.times(0.2f) else maxWidth)
 
     Card(
