@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -38,10 +39,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.drawscope.DrawStyle
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -56,8 +53,6 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.common.util.concurrent.ListenableFuture
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.objects.ObjectDetector
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.domain.extensions.executor
 import com.nkoyo.componentidentifier.domain.extensions.getCameraProvider
@@ -84,9 +79,28 @@ fun MainPreviewScreen(
     navController: NavHostController,
     onAbortApplication: () -> Unit = {},
     onSavePhotoFile: (File) -> Unit = {},
+    onViewRecords: () -> Unit,
     cameraPermissionState: PermissionState = rememberPermissionState(
         Manifest.permission.CAMERA
     ),
+    bottomSheet: @Composable (
+        maxWidth: Dp,
+        maxHeight: Dp,
+        rotationAngle: Float,
+        isMinimized: Boolean,
+        testRecords: List<TestRecord>,
+        onScale: () -> Unit,
+    ) -> Unit = { maxWidth, maxHeight, rotationAngle, minimized, records, onScale ->
+        StaticBottomSheet(
+            maxWidth = maxWidth,
+            maxHeight = maxHeight,
+            rotationAngle = rotationAngle,
+            minimized = minimized,
+            testRecords = records,
+            onScale = onScale,
+            windowSizeClass = windowSizeClass,
+        )
+    },
     gettingStartedContent: @Composable (
         fullWidth: Dp,
     ) -> Unit = { fullWidth ->
@@ -106,14 +120,43 @@ fun MainPreviewScreen(
         onTakeSnapshot: () -> Unit,
         onToggleCamera: () -> Unit,
         rotationAngle: Float,
-    ) -> Unit = { flashlightState, onToggleFlashLight, onTakeSnapshot, onToggleCamera, rotationAngle ->
+        maxWidth: Dp,
+        maxHeight: Dp,
+        isMinimized: Boolean,
+        testRecords: List<TestRecord>,
+        onScale: () -> Unit,
+        gettingStartedState: Boolean,
+    ) -> Unit = { flashlightState,
+                  onToggleFlashLight,
+                  onTakeSnapshot,
+                  onToggleCamera,
+                  rotationAngle,
+                  maxWidth,
+                  maxHeight,
+                  isMinimized,
+                  testRecords,
+                  onScale,
+                  gettingStartedState ->
         MainPreviewScreenContent(
             rotationAngle = rotationAngle,
+            windowSizeClass = windowSizeClass,
             flashLightState = flashlightState,
             onToggleFlashLight = onToggleFlashLight,
             onTakeSnapshot = onTakeSnapshot,
             onToggleCamera = onToggleCamera,
-            onClose = onAbortApplication
+            onClose = onAbortApplication,
+            bottomSheet = {
+                bottomSheet(
+                    maxWidth = maxWidth,
+                    maxHeight = maxHeight,
+                    rotationAngle = rotationAngle,
+                    isMinimized = isMinimized,
+                    testRecords = testRecords,
+                    onScale = onScale,
+                )
+            },
+            gettingStartedState = gettingStartedState,
+            onViewRecords = onViewRecords,
         )
     },
 ) {
@@ -125,7 +168,6 @@ fun MainPreviewScreen(
     val cameraSelector = mainViewModel.cameraSelector
     val cameraExecutor = mainViewModel.cameraExecutor
     val flashLightExecutor = mainViewModel.flashLightExecutor
-    val testRecords by mainViewModel.testRecords.collectAsState()
     val bottomSheetMinimized by mainViewModel.bottomSheetMinimized.collectAsState()
     val gettingStartedState by mainViewModel.gettingStartedState.collectAsStateWithLifecycle()
     var rotationAngle by remember { mutableStateOf(0f) }
@@ -150,6 +192,7 @@ fun MainPreviewScreen(
         remember(flashLightState) { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
     val imageAnalysisUseCase =
         remember { mutableStateOf(ImageAnalysisUseCase().of(Size(point.x, point.y))) }
+    var records by remember { mutableStateOf<List<TestRecord>>(listOf()) }
 
     val orientationEventListener by lazy {
         object : OrientationEventListener(context) {
@@ -183,34 +226,33 @@ fun MainPreviewScreen(
             ImageAnalysis.Analyzer { imageProxy ->
                 val generatedBitmap = imageProxy.toBitmap() ?: return@Analyzer
                 val classifiedResults = mainViewModel.classify(generatedBitmap)
-                mainViewModel.onTestRecordsChanged(
-                    listOf(
-                        TestRecord(
-                            topic = context.getString(R.string.prediction_one),
-                            probability = classifiedResults[context.getString(R.string.prediction_one)].orEmpty()
-                        ),
-                        TestRecord(
-                            topic = context.getString(R.string.probability_one),
-                            probability = classifiedResults[context.getString(R.string.probability_one)].orEmpty()
-                        ),
-                        TestRecord(
-                            topic = context.getString(R.string.prediction_two),
-                            probability = classifiedResults[context.getString(R.string.prediction_two)].orEmpty()
-                        ),
-                        TestRecord(
-                            topic = context.getString(R.string.probability_two),
-                            probability = classifiedResults[context.getString(R.string.probability_two)].orEmpty()
-                        ),
-                        TestRecord(
-                            topic = context.getString(R.string.prediction_three),
-                            probability = classifiedResults[context.getString(R.string.prediction_three)].orEmpty()
-                        ),
-                        TestRecord(
-                            topic = context.getString(R.string.probability_two),
-                            probability = classifiedResults[context.getString(R.string.probability_two)].orEmpty()
-                        ),
-                    )
+                records = listOf(
+                    TestRecord(
+                        topic = context.getString(R.string.prediction_one),
+                        probability = classifiedResults[context.getString(R.string.prediction_one)].orEmpty()
+                    ),
+                    TestRecord(
+                        topic = context.getString(R.string.probability_one),
+                        probability = classifiedResults[context.getString(R.string.probability_one)].orEmpty()
+                    ),
+                    TestRecord(
+                        topic = context.getString(R.string.prediction_two),
+                        probability = classifiedResults[context.getString(R.string.prediction_two)].orEmpty()
+                    ),
+                    TestRecord(
+                        topic = context.getString(R.string.probability_two),
+                        probability = classifiedResults[context.getString(R.string.probability_two)].orEmpty()
+                    ),
+                    TestRecord(
+                        topic = context.getString(R.string.prediction_three),
+                        probability = classifiedResults[context.getString(R.string.prediction_three)].orEmpty()
+                    ),
+                    TestRecord(
+                        topic = context.getString(R.string.probability_two),
+                        probability = classifiedResults[context.getString(R.string.probability_two)].orEmpty()
+                    ),
                 )
+                mainViewModel.onTestRecordsChanged(records)
                 imageProxy.close()
             })
 
@@ -253,69 +295,78 @@ fun MainPreviewScreen(
                 gettingStartedContent(
                     fullWidth = configuration.screenWidthDp.dp,
                 )
-            } else {
-                content(
-                    flashLightState = flashLightState,
-                    rotationAngle = rotationAngle,
-                    onToggleFlashLight = {
-                        when (flashLightState) {
-                            //  circular control
-                            is ImageCaptureFlashMode.Auto -> {
-                                mainViewModel.onFlashLightStateChanged(ImageCaptureFlashMode.On)
-                            }
-
-                            is ImageCaptureFlashMode.On -> {
-                                mainViewModel.onFlashLightStateChanged(ImageCaptureFlashMode.Off)
-                            }
-
-                            is ImageCaptureFlashMode.Off -> {
-                                mainViewModel.onFlashLightStateChanged(ImageCaptureFlashMode.Auto)
-                            }
-                        }
-                    },
-                    onTakeSnapshot = {
-                        coroutineScope.launch {
-                            imageCaptureUseCase.value.takeSnapshot(context.executor)
-                                .let(onSavePhotoFile)
-                        }
-                    },
-                    onToggleCamera = {
-                     //TODO()
-                    }
-                )
             }
 
-            //static bottom sheet
-            AnimatedVisibility(
-                visible = false,
-                enter = slideInVertically(
-                    animationSpec = tween(
-                        durationMillis = 2,
-                        delayMillis = 2,
+            content(
+                flashLightState = flashLightState,
+                rotationAngle = rotationAngle,
+                onToggleFlashLight = {
+                    when (flashLightState) {
+                        //  circular control
+                        is ImageCaptureFlashMode.Auto -> {
+                            mainViewModel.onFlashLightStateChanged(ImageCaptureFlashMode.On)
+                        }
+
+                        is ImageCaptureFlashMode.On -> {
+                            mainViewModel.onFlashLightStateChanged(ImageCaptureFlashMode.Off)
+                        }
+
+                        is ImageCaptureFlashMode.Off -> {
+                            mainViewModel.onFlashLightStateChanged(ImageCaptureFlashMode.Auto)
+                        }
+                    }
+                },
+                onTakeSnapshot = {
+                    coroutineScope.launch {
+                        imageCaptureUseCase.value.takeSnapshot(context.executor)
+                            .let(onSavePhotoFile)
+                    }
+                },
+                onToggleCamera = {
+                    //TODO()
+                },
+                maxWidth = maxWidth,
+                maxHeight = maxHeight,
+                isMinimized = bottomSheetMinimized,
+                testRecords = records,
+                onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) },
+                gettingStartedState = gettingStartedState,
+            )
+
+            if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
+                //static bottom sheet
+                AnimatedVisibility(
+                    visible = !gettingStartedState,
+                    enter = slideInVertically(
+                        animationSpec = tween(
+                            durationMillis = 200,
+                            delayMillis = 2,
+                        ),
+                        initialOffsetY = { -it }
                     ),
-                    initialOffsetY = { -it }
-                ),
-                exit = slideOutVertically(
-                    animationSpec = tween(durationMillis = 2),
-                    targetOffsetY = { -it })
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 16.dp), contentAlignment =
-                    if (bottomSheetMinimized) Alignment.TopCenter else
-                        Alignment.BottomCenter
+                    exit = slideOutVertically(
+                        animationSpec = tween(durationMillis = 2),
+                        targetOffsetY = { -it })
                 ) {
-                    StaticBottomSheet(
-                        maxWidth = maxWidth,
-                        maxHeight = maxHeight,
-                        rotationAngle = rotationAngle,
-                        minimized = bottomSheetMinimized,
-                        testRecords = testRecords,
-                        onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) }
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 16.dp), contentAlignment =
+                        if (bottomSheetMinimized) Alignment.TopCenter else
+                            Alignment.BottomCenter
+                    ) {
+                        bottomSheet(
+                            maxWidth = maxWidth,
+                            maxHeight = maxHeight,
+                            rotationAngle = rotationAngle,
+                            isMinimized = bottomSheetMinimized,
+                            testRecords = records,
+                            onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) }
+                        )
+                    }
                 }
             }
+
         }
     }
 }
