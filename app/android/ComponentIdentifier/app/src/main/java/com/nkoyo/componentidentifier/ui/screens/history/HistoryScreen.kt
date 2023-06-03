@@ -57,7 +57,7 @@ fun HistoryScreen(
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = stringResource(id = R.string.records),
-                            style = MaterialTheme.typography.headlineSmall,
+                            style = MaterialTheme.typography.titleMedium,
                         )
 
                         if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact) {
@@ -88,7 +88,7 @@ fun HistoryScreen(
                 },
                 actions = {
                     if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
-                        Box(Modifier.padding(8.dp)) {
+                        Box(Modifier.padding(4.dp)) {
                             IconButton(
                                 onClick = onStartSearch,
                                 enabled = true,
@@ -103,7 +103,7 @@ fun HistoryScreen(
                         }
                     }
 
-                    Box(Modifier.padding(8.dp)) {
+                    Box(Modifier.padding(4.dp)) {
                         IconButton(
                             onClick = onOptionsPressed,
                             enabled = true,
@@ -151,7 +151,10 @@ private fun HistoryScreenContent(
 
         if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact) {
             Box(Modifier.width(configuration.screenWidthDp.dp.times(0.67f))) {
-                HistoryDetailsScreen()
+                HistoryDetailsScreen(
+                    windowSizeClass = windowSizeClass,
+                    fullWidth = configuration.screenWidthDp.dp,
+                )
             }
         }
     }
