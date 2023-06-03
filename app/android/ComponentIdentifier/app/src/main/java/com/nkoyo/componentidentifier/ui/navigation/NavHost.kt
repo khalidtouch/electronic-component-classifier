@@ -57,7 +57,10 @@ fun NavHostWrapper(
         }
 
         composable(Route.HistoryDetailScreen) {
-            HistoryDetailsScreen()
+            HistoryDetailsScreen(
+                onBackPressed = { navController.navigate(Route.HistoryScreen) },
+                windowSizeClass = windowSizeClass,
+            )
         }
     }
 }
