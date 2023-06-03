@@ -128,7 +128,7 @@ fun CircleIconButton(
     contentDescription: String,
     padding: Dp = 8.dp,
     rotationAngle: Float,
-    selected: Boolean = false,
+    selected: Boolean = true,
 ) {
     Surface(
         modifier = modifier
