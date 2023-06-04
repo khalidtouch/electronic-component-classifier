@@ -147,7 +147,7 @@ private fun HistoryScreenContent(
     Row(Modifier.fillMaxSize().padding(top = 32.dp)) {
         val configuration = LocalConfiguration.current
 
-        HistoryListScreen(historyItems = fakeHistoryItem, onClick = onClick)
+        HistoryListScreen( onClick = onClick, mainViewModel = mainViewModel)
 
         if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact) {
             Box(Modifier.width(configuration.screenWidthDp.dp.times(0.67f))) {

@@ -87,11 +87,6 @@ class ComponentClassifierImpl @Inject constructor(
             var inferenceTime = endTime - startTime
             val indexArray = getMaxResultFromFloatArray(output[0])
 
-            Log.e(TAG, "classify: prob values are ${output[0].map { (it * 100).toString() }}")
-
-            Log.e(
-                TAG,
-                "classify: the index array of prob is ${indexArray.map { it.toString() }}")
             val firstProbability =
                 (output.first()[indexArray[0]] * 100).roundToInt().toString().appendPercent()
             val secondProbability =
@@ -110,6 +105,32 @@ class ComponentClassifierImpl @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             hashMapOf<String, String>()
+        }
+    }
+
+    override fun classifyAndProduceHighestProbabilityLabel(bitmap: Bitmap): Pair<String, Float> {
+        return try {
+            check(initializationState) {
+                "The TensorFlow Model has not being initialized"
+            }
+            imageBuffer = convertImageIntoTensorImage(bitmap)
+            val output = Array(1) { FloatArray(labels.size) }
+
+
+            val startTime = SystemClock.uptimeMillis()
+            interpreter?.run(imageBuffer?.buffer, output) //interprete the image
+            val endTime = SystemClock.uptimeMillis()
+
+            var inferenceTime = endTime - startTime
+            val indexArray = getMaxResultFromFloatArray(output[0])
+
+            val label = labels[indexArray[0]].lowercase()
+            val highestProbability =
+                (output.first()[indexArray[0]] * 100)
+            Pair(label, highestProbability)
+        }catch (e: Exception) {
+            e.printStackTrace()
+            Pair("", 0f)
         }
     }
 

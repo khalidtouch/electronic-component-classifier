@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 import java.io.File
 
 
@@ -27,8 +28,10 @@ import java.io.File
 fun MainScreen(
     modifier: Modifier = Modifier,
     windowSizeClass: WindowSizeClass,
+    mainViewModel: MainViewModel,
     onAbortApplication: () -> Unit = {},
     onViewRecords: () -> Unit,
+    onPreviewWebInfo: (String) -> Unit,
     navController: NavHostController,
     emptyImageUri: Uri = Uri.parse("file://dev/null"),
     captureContent: @Composable (imageUri: MutableState<Uri>, onRemove: () -> Unit, rotationAngle: Float) -> Unit = { uriState, onRemove, rotationAngle ->
@@ -45,6 +48,7 @@ fun MainScreen(
             onSavePhotoFile = onSavePhotoFile,
             windowSizeClass = windowSizeClass,
             onViewRecords = onViewRecords,
+            onPreviewWebInfo = onPreviewWebInfo,
         )
     }
 ) {
@@ -52,13 +56,11 @@ fun MainScreen(
     val context = LocalContext.current
     var rotationAngle by remember { mutableStateOf(0f) }
     val imageUri = remember { mutableStateOf(emptyImageUri) }
-    Log.e(TAG, "MainScreen: the value of uri is ${imageUri.value}")
 
     val orientationEventListener by lazy {
         object : OrientationEventListener(context) {
             override fun onOrientationChanged(orientation: Int) {
                 rotationAngle = orientation.toFloat()
-                Log.e(TAG, "onOrientationChanged: current orientation value is $orientation")
             }
 
         }
@@ -70,17 +72,19 @@ fun MainScreen(
     }
 
     if (imageUri.value != emptyImageUri) {
-        Log.e(TAG, "MainScreen: image uri is NOT empty")
         captureContent(
             imageUri = imageUri,
             rotationAngle = rotationAngle,
             onRemove = { imageUri.value = emptyImageUri }
         )
     } else {
-        Log.e(TAG, "MainScreen: image uri is empty")
         previewContent(
             onSavePhotoFile = {
                 imageUri.value = it.toUri()
+                mainViewModel.registerHistory(
+                    componentName = "",
+                    imageUrl = imageUri.value.toString(),
+                )
             }
         )
     }

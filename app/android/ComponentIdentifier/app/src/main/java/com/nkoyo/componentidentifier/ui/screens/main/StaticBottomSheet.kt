@@ -28,12 +28,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.ui.components.CircleIconButton
+import com.nkoyo.componentidentifier.ui.components.SecondaryButton
 import com.nkoyo.componentidentifier.ui.components.TestRecord
 import com.nkoyo.componentidentifier.ui.components.TestRecordScreen
+import java.time.LocalDateTime
 
 
 @Composable
@@ -41,11 +45,13 @@ fun StaticBottomSheet(
     modifier: Modifier = Modifier,
     maxWidth: Dp,
     maxHeight: Dp,
+    onPreviewWebInfo: (String) -> Unit,
     windowSizeClass: WindowSizeClass,
     rotationAngle: Float,
     context: Context = LocalContext.current,
     minimized: Boolean = false,
     onScale: () -> Unit = {},
+    info: ComponentInfo,
     testRecords: List<TestRecord> =
         listOf(
             TestRecord(
@@ -74,10 +80,10 @@ fun StaticBottomSheet(
             ),
         )
 ) {
-    val calculatedHeight = if(windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
+    val calculatedHeight = if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
         maxHeight.times(0.4f)
     } else maxHeight
-    val height by  animateDpAsState(targetValue = if (minimized) 32.dp else calculatedHeight)
+    val height by animateDpAsState(targetValue = if (minimized) 32.dp else calculatedHeight)
     val width by animateDpAsState(targetValue = if (minimized) maxWidth.times(0.2f) else maxWidth)
 
     Card(
@@ -89,9 +95,10 @@ fun StaticBottomSheet(
             focusedElevation = 2.dp,
         )
     ) {
-        if(!minimized) {
+        if (!minimized) {
             Spacer(modifier = modifier.height(8.dp))
 
+            //gutter
             Row(
                 modifier = modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -124,12 +131,41 @@ fun StaticBottomSheet(
 
             Spacer(modifier = modifier.height(12.dp))
 
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+                Text(
+                    text = info.componentName,
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.outline,
+                    )
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = info.description,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.outline
+                    ),
+                    maxLines = 5,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(Modifier.height(24.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    SecondaryButton(
+                        label = stringResource(id = R.string.read_more),
+                        onClick = { onPreviewWebInfo(info.url) },
+                        contentColor = MaterialTheme.colorScheme.outline,
+                    )
+                }
+            }
+
+            /**
             testRecords.forEach { testRecord ->
                 TestRecordScreen(
                     testRecord = testRecord,
                     modifier = modifier.padding(horizontal = 16.dp, vertical = 2.dp),
                 )
             }
+            */
         } else {
             Box(
                 modifier = modifier
@@ -148,3 +184,11 @@ fun StaticBottomSheet(
 
     }
 }
+
+
+data class ComponentInfo(
+    val componentName: String,
+    val description: String,
+    val url: String,
+    val dateTime: LocalDateTime,
+)
