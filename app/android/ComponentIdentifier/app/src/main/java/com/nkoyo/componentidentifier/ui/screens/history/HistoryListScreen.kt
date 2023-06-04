@@ -1,5 +1,6 @@
 package com.nkoyo.componentidentifier.ui.screens.history
 
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,9 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,20 +25,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.nkoyo.componentidentifier.domain.extensions.asString
-import kotlinx.coroutines.withContext
+import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 import java.time.LocalDateTime
+import androidx.paging.compose.items
+import com.nkoyo.componentidentifier.R
 
 @Composable
 fun HistoryListScreen(
-    historyItems: List<HistoryItem>,
+    mainViewModel: MainViewModel,
     onClick: (HistoryItem) -> Unit
 ) {
+    val history = mainViewModel.historyAsPaged.collectAsLazyPagingItems()
+
     LazyColumn(
         Modifier.padding(
             start = 16.dp,
@@ -48,42 +52,48 @@ fun HistoryListScreen(
             bottom = 16.dp,
         )
     ) {
-        historyItems.map { history ->
-            historyListItem(history, onClick = onClick)
+        items(history) { item ->
+            HistoryListItem(
+                item = HistoryItem(
+                    componentName = item?.componentName ?: stringResource(id = R.string.component),
+                    dateTime = item?.dateTime ?: LocalDateTime.now(),
+                    value = "",
+                ),
+                onClick
+            )
         }
     }
 }
 
 
-private fun LazyListScope.historyListItem(
+@Composable
+private fun HistoryListItem(
     item: HistoryItem,
     onClick: (HistoryItem) -> Unit,
 ) {
-    item {
-        ListItemWrapper(onClick = { onClick(item) }) {
-            Column {
-                Text(
-                    text = item.componentName,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                    )
+    ListItemWrapper(onClick = { onClick(item) }) {
+        Column {
+            Text(
+                text = item.componentName,
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
                 )
-                Spacer(Modifier.height(8.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(
-                        text = item.value,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        text = item.dateTime.asString(),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text = item.value,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Text(
+                    text = item.dateTime.asString(),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
             }
+
         }
-        Spacer(Modifier.height(12.dp))
     }
+    Spacer(Modifier.height(12.dp))
 }
 
 

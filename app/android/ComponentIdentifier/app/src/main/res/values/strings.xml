@@ -25,4 +25,6 @@
     <string name="options">options</string>
     <string name="records">Records</string>
     <string name="search_records">Search Records</string>
+    <string name="read_more">Read more</string>
+    <string name="component">Component</string>
 </resources>

@@ -61,11 +61,15 @@ import com.nkoyo.componentidentifier.domain.usecases.CameraPreviewUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageAnalysisUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
+import com.nkoyo.componentidentifier.network.linker
 import com.nkoyo.componentidentifier.ui.components.TestRecord
+import com.nkoyo.componentidentifier.ui.viewmodel.HighestProbabilityComponent
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.Exception
+import java.time.LocalDateTime
 
 
 @SuppressLint("UnsafeOptInUsageError")
@@ -80,6 +84,7 @@ fun MainPreviewScreen(
     onAbortApplication: () -> Unit = {},
     onSavePhotoFile: (File) -> Unit = {},
     onViewRecords: () -> Unit,
+    onPreviewWebInfo: (String) -> Unit,
     cameraPermissionState: PermissionState = rememberPermissionState(
         Manifest.permission.CAMERA
     ),
@@ -90,7 +95,8 @@ fun MainPreviewScreen(
         isMinimized: Boolean,
         testRecords: List<TestRecord>,
         onScale: () -> Unit,
-    ) -> Unit = { maxWidth, maxHeight, rotationAngle, minimized, records, onScale ->
+        info: ComponentInfo,
+    ) -> Unit = { maxWidth, maxHeight, rotationAngle, minimized, records, onScale, info ->
         StaticBottomSheet(
             maxWidth = maxWidth,
             maxHeight = maxHeight,
@@ -99,6 +105,8 @@ fun MainPreviewScreen(
             testRecords = records,
             onScale = onScale,
             windowSizeClass = windowSizeClass,
+            onPreviewWebInfo = onPreviewWebInfo,
+            info = info,
         )
     },
     gettingStartedContent: @Composable (
@@ -126,6 +134,8 @@ fun MainPreviewScreen(
         testRecords: List<TestRecord>,
         onScale: () -> Unit,
         gettingStartedState: Boolean,
+        info: ComponentInfo,
+        bottomSheetVisibility: Boolean,
     ) -> Unit = { flashlightState,
                   onToggleFlashLight,
                   onTakeSnapshot,
@@ -136,7 +146,9 @@ fun MainPreviewScreen(
                   isMinimized,
                   testRecords,
                   onScale,
-                  gettingStartedState ->
+                  gettingStartedState,
+                  info,
+                  bottomSheetVisibility ->
         MainPreviewScreenContent(
             rotationAngle = rotationAngle,
             windowSizeClass = windowSizeClass,
@@ -153,10 +165,12 @@ fun MainPreviewScreen(
                     isMinimized = isMinimized,
                     testRecords = testRecords,
                     onScale = onScale,
+                    info = info,
                 )
             },
             gettingStartedState = gettingStartedState,
             onViewRecords = onViewRecords,
+            bottomSheetVisibility = bottomSheetVisibility,
         )
     },
 ) {
@@ -172,6 +186,13 @@ fun MainPreviewScreen(
     val gettingStartedState by mainViewModel.gettingStartedState.collectAsStateWithLifecycle()
     var rotationAngle by remember { mutableStateOf(0f) }
     val objectBoundingBoxes by mainViewModel.objectBoundingBoxes.collectAsStateWithLifecycle()
+    val highestProbabilityComponent by mainViewModel.currentHighestProbabilityComponent.collectAsStateWithLifecycle()
+    val bottomSheetVisibilityState by mainViewModel.bottomSheetVisibilityState.collectAsStateWithLifecycle()
+    val highestProbabilityComponentBuffer = remember {
+        mutableStateOf<HighestProbabilityComponent>(
+            HighestProbabilityComponent.Default
+        )
+    }
 
     val previewView: PreviewView = remember {
         val view = PreviewView(context).apply {
@@ -211,48 +232,40 @@ fun MainPreviewScreen(
         }
     }
 
+    LaunchedEffect(highestProbabilityComponent, gettingStartedState) {
+        //control the bottom sheet data and visibility
+        Log.e(TAG, "MainPreviewScreen: bottom sheet effect called")
+        if(gettingStartedState) return@LaunchedEffect
+        if(highestProbabilityComponent == HighestProbabilityComponent.Default) return@LaunchedEffect
+        delay(3_000)
+        if(!bottomSheetVisibilityState) {
+            highestProbabilityComponentBuffer.value = highestProbabilityComponent
+            mainViewModel.updateBottomSheetVisibility(true)
+        }
+    }
+
     DisposableEffect(Unit) {
-        Log.e(TAG, "MainPreviewScreen: DiposableEffect has been called")
+        mainViewModel.updateBottomSheetVisibility(false)
         orientationEventListener.enable()
         onDispose { orientationEventListener.disable() }
     }
 
     LaunchedEffect(Unit, cameraPreviewUseCase.value, cameraSelector, flashLightState) {
-        Log.e(TAG, "MainPreviewScreen: refresh camera use-case bindings")
         val provider = context.getCameraProvider()
 
         imageAnalysisUseCase.value.setAnalyzer(
             cameraExecutor,
             ImageAnalysis.Analyzer { imageProxy ->
                 val generatedBitmap = imageProxy.toBitmap() ?: return@Analyzer
-                val classifiedResults = mainViewModel.classify(generatedBitmap)
-                records = listOf(
-                    TestRecord(
-                        topic = context.getString(R.string.prediction_one),
-                        probability = classifiedResults[context.getString(R.string.prediction_one)].orEmpty()
-                    ),
-                    TestRecord(
-                        topic = context.getString(R.string.probability_one),
-                        probability = classifiedResults[context.getString(R.string.probability_one)].orEmpty()
-                    ),
-                    TestRecord(
-                        topic = context.getString(R.string.prediction_two),
-                        probability = classifiedResults[context.getString(R.string.prediction_two)].orEmpty()
-                    ),
-                    TestRecord(
-                        topic = context.getString(R.string.probability_two),
-                        probability = classifiedResults[context.getString(R.string.probability_two)].orEmpty()
-                    ),
-                    TestRecord(
-                        topic = context.getString(R.string.prediction_three),
-                        probability = classifiedResults[context.getString(R.string.prediction_three)].orEmpty()
-                    ),
-                    TestRecord(
-                        topic = context.getString(R.string.probability_two),
-                        probability = classifiedResults[context.getString(R.string.probability_two)].orEmpty()
-                    ),
+                val generatedClassificationResponse =
+                    mainViewModel.classifyAndProduceHighestProbabilityLabel(generatedBitmap)
+
+                mainViewModel.updateHighestProbabilityComponent(
+                    HighestProbabilityComponent(
+                        label = generatedClassificationResponse.first,
+                        prob = generatedClassificationResponse.second
+                    )
                 )
-                mainViewModel.onTestRecordsChanged(records)
                 imageProxy.close()
             })
 
@@ -279,6 +292,7 @@ fun MainPreviewScreen(
             e.printStackTrace()
         }
     }
+
 
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -331,12 +345,19 @@ fun MainPreviewScreen(
                 testRecords = records,
                 onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) },
                 gettingStartedState = gettingStartedState,
+                info = ComponentInfo(
+                    componentName = highestProbabilityComponentBuffer.value.label.uppercase(),
+                    description = linker[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
+                    url = linker[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
+                    dateTime = LocalDateTime.now(),
+                ),
+                bottomSheetVisibility = bottomSheetVisibilityState,
             )
 
             if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
                 //static bottom sheet
                 AnimatedVisibility(
-                    visible = !gettingStartedState,
+                    visible = bottomSheetVisibilityState,
                     enter = slideInVertically(
                         animationSpec = tween(
                             durationMillis = 200,
@@ -361,12 +382,17 @@ fun MainPreviewScreen(
                             rotationAngle = rotationAngle,
                             isMinimized = bottomSheetMinimized,
                             testRecords = records,
-                            onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) }
+                            onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) },
+                            info = ComponentInfo(
+                                componentName = highestProbabilityComponentBuffer.value.label.uppercase(),
+                                description = linker[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
+                                url = linker[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
+                                dateTime = LocalDateTime.now(),
+                            )
                         )
                     }
                 }
             }
-
         }
     }
 }
