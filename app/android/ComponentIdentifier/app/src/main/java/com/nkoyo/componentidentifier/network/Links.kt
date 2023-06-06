@@ -19,3 +19,7 @@ val linker: HashMap<String, Pair<String, String>> = hashMapOf(
 
     "transformer" to Pair("https://en.wikipedia.org/wiki/Transformer", "A transformer is a passive component that transfers electrical energy from one electrical circuit to another circuit, or multiple circuits. A varying current in any coil of the transformer produces a varying magnetic flux in the transformer's core, which induces a varying electromotive force (EMF) across any other coils wound around the same core. Electrical energy can be transferred between separate coils without a metallic (conductive) connection between the two circuits. Faraday's law of induction, discovered in 1831, describes the induced voltage effect in any coil due to a changing magnetic flux encircled by the coil.")
 )
+
+val linker2: HashMap<String, Pair<String, String>> = hashMapOf(
+
+)

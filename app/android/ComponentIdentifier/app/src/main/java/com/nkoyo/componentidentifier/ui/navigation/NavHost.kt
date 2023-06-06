@@ -45,7 +45,7 @@ fun NavHostWrapper(
                 windowSizeClass = windowSizeClass,
                 onAbortApplication = onAbortApplication,
                 onViewRecords = { navController.navigate(Route.HistoryScreen) },
-                onPreviewWebInfo = { link -> navController.navigate("${Route.WebInfoScreen}/$link") },
+                onPreviewWebInfo = { navController.navigate(Route.WebInfoScreen) },
                 mainViewModel = mainViewModel,
             )
         }
@@ -61,20 +61,22 @@ fun NavHostWrapper(
             )
         }
 
-        composable(Route.HistoryDetailScreen) {
+        composable(
+            route = Route.HistoryDetailScreen,
+        ) {
             HistoryDetailsScreen(
                 onBackPressed = { navController.navigate(Route.HistoryScreen) },
                 windowSizeClass = windowSizeClass,
+                mainViewModel = mainViewModel,
             )
         }
 
         composable(
-            route = "${Route.WebInfoScreen}/{url}",
-            arguments = listOf(navArgument("url") { type = NavType.StringType })
-        ) { entry ->
+            route = Route.WebInfoScreen,
+        ) {
             WebInfoScreen(
                 onClose = { navController.navigate(Route.MainScreen) },
-                url = requireNotNull(entry.arguments).getString("url")!!
+                mainViewModel = mainViewModel
             )
         }
     }

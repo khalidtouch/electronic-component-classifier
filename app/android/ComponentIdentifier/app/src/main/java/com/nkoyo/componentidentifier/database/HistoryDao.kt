@@ -25,6 +25,11 @@ interface HistoryDao {
     )
     fun findByComponentName(componentName: String): Flow<List<HistoryEntity>>
 
+    @Query(
+        value = "select * from HistoryEntity where historyId like :id"
+    )
+    fun findByComponentId(id : Long): Flow<HistoryEntity?>
+
     @Query("select * from HistoryEntity order by dateTime desc")
     fun showHistory(): Flow<List<HistoryEntity>>
 

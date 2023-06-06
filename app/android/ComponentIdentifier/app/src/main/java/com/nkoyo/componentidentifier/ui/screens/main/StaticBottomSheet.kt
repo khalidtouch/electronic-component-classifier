@@ -45,40 +45,14 @@ fun StaticBottomSheet(
     modifier: Modifier = Modifier,
     maxWidth: Dp,
     maxHeight: Dp,
-    onPreviewWebInfo: (String) -> Unit,
+    onPreviewWebInfo: () -> Unit,
+    openUrl: (String) -> Unit,
     windowSizeClass: WindowSizeClass,
     rotationAngle: Float,
     context: Context = LocalContext.current,
     minimized: Boolean = false,
     onScale: () -> Unit = {},
     info: ComponentInfo,
-    testRecords: List<TestRecord> =
-        listOf(
-            TestRecord(
-                topic = context.getString(R.string.prediction_one),
-                probability = "classifiedResults[context.getString(R.string.prediction_one)].orEmpty()"
-            ),
-            TestRecord(
-                topic = context.getString(R.string.probability_one),
-                probability = "classifiedResults[context.getString(R.string.probability_one)].orEmpty()"
-            ),
-            TestRecord(
-                topic = context.getString(R.string.prediction_two),
-                probability = "classifiedResults[context.getString(R.string.prediction_two)].orEmpty()"
-            ),
-            TestRecord(
-                topic = context.getString(R.string.probability_two),
-                probability = "classifiedResults[context.getString(R.string.probability_two)].orEmpty()"
-            ),
-            TestRecord(
-                topic = context.getString(R.string.prediction_three),
-                probability = "classifiedResults[context.getString(R.string.prediction_three)].orEmpty()"
-            ),
-            TestRecord(
-                topic = context.getString(R.string.probability_three),
-                probability = "classifiedResults[context.getString(R.string.probability_two)].orEmpty()"
-            ),
-        )
 ) {
     val calculatedHeight = if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
         maxHeight.times(0.4f)
@@ -98,7 +72,6 @@ fun StaticBottomSheet(
         if (!minimized) {
             Spacer(modifier = modifier.height(8.dp))
 
-            //gutter
             Row(
                 modifier = modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -114,58 +87,55 @@ fun StaticBottomSheet(
                 )
             }
 
-            Box(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp), contentAlignment = Alignment.CenterEnd
-            ) {
-                CircleIconButton(
-                    icon = if (minimized) R.drawable.icon_maximize else R.drawable.icon_minimize,
-                    contentDescription = stringResource(id = R.string.scale_button),
-                    onClick = onScale,
-                    surfaceColor = Color.Transparent,
-                    borderColor = Color.Transparent,
-                    rotationAngle = rotationAngle,
-                )
-            }
 
-            Spacer(modifier = modifier.height(12.dp))
-
-            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-                Text(
-                    text = info.componentName,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.outline,
-                    )
-                )
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = info.description,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.outline
-                    ),
-                    maxLines = 5,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(Modifier.height(24.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    SecondaryButton(
-                        label = stringResource(id = R.string.read_more),
-                        onClick = { onPreviewWebInfo(info.url) },
-                        contentColor = MaterialTheme.colorScheme.outline,
+            Box(Modifier.padding(16.dp)) {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp), contentAlignment = Alignment.CenterEnd
+                ) {
+                    CircleIconButton(
+                        icon = if (minimized) R.drawable.icon_maximize else R.drawable.icon_minimize,
+                        contentDescription = stringResource(id = R.string.scale_button),
+                        onClick = onScale,
+                        surfaceColor = Color.Transparent,
+                        borderColor = Color.Transparent,
+                        rotationAngle = rotationAngle,
                     )
                 }
-            }
 
-            /**
-            testRecords.forEach { testRecord ->
-                TestRecordScreen(
-                    testRecord = testRecord,
-                    modifier = modifier.padding(horizontal = 16.dp, vertical = 2.dp),
-                )
+                Spacer(modifier = modifier.height(12.dp))
+
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+                    Text(
+                        text = info.componentName,
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.outline,
+                        )
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = info.description,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.outline
+                        ),
+                        maxLines = 5,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(Modifier.height(24.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        SecondaryButton(
+                            label = stringResource(id = R.string.read_more),
+                            onClick = {
+                                openUrl(info.url)
+                                onPreviewWebInfo()
+                            },
+                            contentColor = MaterialTheme.colorScheme.outline,
+                        )
+                    }
+                }
             }
-            */
         } else {
             Box(
                 modifier = modifier

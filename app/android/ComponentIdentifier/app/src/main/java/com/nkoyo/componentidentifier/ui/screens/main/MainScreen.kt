@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
@@ -31,7 +32,7 @@ fun MainScreen(
     mainViewModel: MainViewModel,
     onAbortApplication: () -> Unit = {},
     onViewRecords: () -> Unit,
-    onPreviewWebInfo: (String) -> Unit,
+    onPreviewWebInfo: () -> Unit,
     navController: NavHostController,
     emptyImageUri: Uri = Uri.parse("file://dev/null"),
     captureContent: @Composable (imageUri: MutableState<Uri>, onRemove: () -> Unit, rotationAngle: Float) -> Unit = { uriState, onRemove, rotationAngle ->
@@ -49,6 +50,7 @@ fun MainScreen(
             windowSizeClass = windowSizeClass,
             onViewRecords = onViewRecords,
             onPreviewWebInfo = onPreviewWebInfo,
+            mainViewModel = mainViewModel,
         )
     }
 ) {
@@ -56,6 +58,7 @@ fun MainScreen(
     val context = LocalContext.current
     var rotationAngle by remember { mutableStateOf(0f) }
     val imageUri = remember { mutableStateOf(emptyImageUri) }
+    val highestProbabilityComponentLabel by mainViewModel.highestProbabilityComponentLabel.collectAsStateWithLifecycle()
 
     val orientationEventListener by lazy {
         object : OrientationEventListener(context) {
@@ -82,7 +85,7 @@ fun MainScreen(
             onSavePhotoFile = {
                 imageUri.value = it.toUri()
                 mainViewModel.registerHistory(
-                    componentName = "",
+                    componentName = highestProbabilityComponentLabel,
                     imageUrl = imageUri.value.toString(),
                 )
             }

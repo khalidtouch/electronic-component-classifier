@@ -31,11 +31,15 @@ import com.nkoyo.componentidentifier.domain.classifier.ComponentClassifier
 import com.nkoyo.componentidentifier.domain.repository.HistoryRepository
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.ui.components.TestRecord
+import com.nkoyo.componentidentifier.ui.screens.history.HistoryItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
@@ -43,12 +47,16 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
+const val KEY_SELECTED_HISTORY_ID = "selected_history_id"
+const val KEY_SELECTED_URL = "selected_url"
+
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @SuppressLint("StaticFieldLeak") @ApplicationContext private val context: Context,
     private val componentClassifier: ComponentClassifier,
     private val historyRepository: HistoryRepository,
-    ) : ViewModel() {
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel() {
     val TAG = "MainViewModel"
 
     init {
@@ -68,21 +76,12 @@ class MainViewModel @Inject constructor(
     private var _testRecords = MutableStateFlow(mutableListOf<TestRecord>())
     val testRecords: StateFlow<List<TestRecord>> = _testRecords
 
-    private var _bottomSheetMinimized = MutableStateFlow(false)
+    private var _bottomSheetMinimized = MutableStateFlow(true)
     val bottomSheetMinimized: StateFlow<Boolean> = _bottomSheetMinimized
 
     private val _gettingStartedState = MutableStateFlow<Boolean>(true)
     val gettingStartedState: StateFlow<Boolean> = _gettingStartedState
 
-    private val _bottomSheetVisibilityState = MutableStateFlow<Boolean>(false)
-    val bottomSheetVisibilityState: StateFlow<Boolean> = _bottomSheetVisibilityState
-
-    fun updateBottomSheetVisibility(state: Boolean) {
-        _bottomSheetVisibilityState.value = state
-    }
-
-    private val _objectBoundingBoxes = MutableStateFlow<ArrayList<ObjectBoundingBox>>(arrayListOf())
-    val objectBoundingBoxes: StateFlow<ArrayList<ObjectBoundingBox>> = _objectBoundingBoxes
 
     private val _currentHighestProbabilityComponent =
         MutableStateFlow<HighestProbabilityComponent>(HighestProbabilityComponent.Default)
@@ -91,6 +90,28 @@ class MainViewModel @Inject constructor(
 
     val historyAsPaged: Flow<PagingData<HistoryEntity>> =
         historyRepository.showHistoryAsPaged(20)
+
+    val selectedHistoryId: StateFlow<Long> = savedStateHandle.getStateFlow(
+        key = KEY_SELECTED_HISTORY_ID, initialValue = -1L,
+    )
+
+    private val _selectedHistoryEntity = MutableStateFlow<HistoryEntity?>(null)
+    val selectedHistoryEntity: StateFlow<HistoryEntity?> = _selectedHistoryEntity
+
+    val selectedUrl: StateFlow<String> = savedStateHandle.getStateFlow(
+        key = KEY_SELECTED_URL, initialValue = ""
+    )
+
+    private val _highestProbabilityComponentLabel = MutableStateFlow<String>("")
+    val highestProbabilityComponentLabel: StateFlow<String> = _highestProbabilityComponentLabel
+
+    fun navigateToHistoryDetails(newId: Long) {
+        savedStateHandle[KEY_SELECTED_HISTORY_ID] = newId
+    }
+
+    fun openWebUrl(url: String) {
+        savedStateHandle[KEY_SELECTED_URL] = url
+    }
 
     fun updateHighestProbabilityComponent(component: HighestProbabilityComponent) {
         _currentHighestProbabilityComponent.value = component
@@ -107,6 +128,10 @@ class MainViewModel @Inject constructor(
 
     private fun onCameraSelectorChanged(selector: CameraSelector) {
         // _cameraSelector.value = selector
+    }
+
+    fun updateHighestProbabilityLabel(label: String) {
+        _highestProbabilityComponentLabel.value = label
     }
 
     fun onFlashLightStateChanged(state: ImageCaptureFlashMode) {
@@ -127,47 +152,11 @@ class MainViewModel @Inject constructor(
 
     private fun initialize() = componentClassifier.initialize()
 
-    fun runObjectDetection(
-        bitmap: Bitmap?,
-        rotationDegrees: Int,
-        onSuccess: ObjectDetectionSuccessListener,
-        onFailure: ObjectDetectionFailureListener,
-    ) {
-        val model = "obj_detection_sample_1.tflite"
-        //val model = "object_detection_mobile_google.tflite"
-        if (bitmap == null) return
-        val localModel = LocalModel.Builder()
-            .setAssetFilePath(MODEL_FILENAME_TEST).build()
-        val options = CustomObjectDetectorOptions.Builder(localModel)
-            .setDetectorMode(CustomObjectDetectorOptions.SINGLE_IMAGE_MODE)
-            .enableMultipleObjects()
-            .enableClassification()
-            .build()
-        val detector = ObjectDetection.getClient(options)
-        val inputImage = InputImage.fromBitmap(bitmap, rotationDegrees)
-        detector.process(inputImage).addOnSuccessListener(onSuccess)
-            .addOnFailureListener(onFailure)
-    }
-
     fun close() = componentClassifier.close()
 
 
     fun onApplicationStarted() {
         _gettingStartedState.value = false
-    }
-
-    fun addToObjectBoundingBoxes(objectBoundingBox: ObjectBoundingBox) {
-        if (_objectBoundingBoxes.value.find { it.box == objectBoundingBox.box || it.text == objectBoundingBox.text } != null)
-            _objectBoundingBoxes.value.remove(objectBoundingBox)
-        _objectBoundingBoxes.value.add(objectBoundingBox)
-    }
-
-    fun removeFromObjectBoundingBoxes(objectBoundingBox: ObjectBoundingBox) {
-        _objectBoundingBoxes.value.remove(objectBoundingBox)
-    }
-
-    fun clearObjectBoundingBoxes() {
-        _objectBoundingBoxes.value.clear()
     }
 
     fun registerHistory(componentName: String, imageUrl: String) {
@@ -192,15 +181,23 @@ class MainViewModel @Inject constructor(
     fun clearHistory() {
         viewModelScope.launch { historyRepository.clearHistory() }
     }
+
+    private fun updateSelectedHistoryEntity(history: HistoryEntity?) {
+        _selectedHistoryEntity.value = history
+    }
+
+    fun findByComponentId(id: Long) {
+        viewModelScope.launch {
+            val historyEntity = historyRepository.findByComponentId(id)
+            historyEntity.collectLatest {
+                updateSelectedHistoryEntity(it)
+                Log.e(TAG, "findByComponentId: selected historyitem is $it")
+            }
+        }
+    }
+
 }
 
-data class ObjectBoundingBox(
-    val text: String,
-    val box: Rect,
-)
-
-typealias ObjectDetectionSuccessListener = (List<DetectedObject>) -> Unit
-typealias ObjectDetectionFailureListener = (Exception) -> Unit
 
 data class HighestProbabilityComponent(
     val label: String,
