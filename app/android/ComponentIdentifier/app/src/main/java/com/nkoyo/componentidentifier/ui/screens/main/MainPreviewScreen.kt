@@ -207,7 +207,6 @@ fun MainPreviewScreen(
         remember(flashLightState) { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
     val imageAnalysisUseCase =
         remember { mutableStateOf(ImageAnalysisUseCase().of(Size(point.x, point.y))) }
-    var records by remember { mutableStateOf<List<TestRecord>>(listOf()) }
 
     val orientationEventListener by lazy {
         object : OrientationEventListener(context) {
