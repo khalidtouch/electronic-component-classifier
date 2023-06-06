@@ -1,6 +1,0 @@
-Capacitor
-Diode
-IC
-Inductor
-Resistor
-Transformer
