@@ -29,8 +29,10 @@ import javax.inject.Singleton
 import kotlin.math.roundToInt
 
 const val MODEL_FILENAME = "mobilenet_v2_fine_tuned2.tflite"
+const val MODEL_FILENAME_2 = "mobilenet_v2_naive_model.tflite"
 const val MODEL_FILENAME_TEST = "mobilenet_v2_fine_tuned.tflite"
 const val LABEL_FILENAME = "labels.txt"
+const val LABEL_FILENAME_2 = "labels2.txt"
 
 @Singleton
 class ComponentClassifierImpl @Inject constructor(
@@ -128,7 +130,7 @@ class ComponentClassifierImpl @Inject constructor(
             val highestProbability =
                 (output.first()[indexArray[0]] * 100)
             Pair(label, highestProbability)
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             Pair("", 0f)
         }
@@ -195,7 +197,7 @@ class ComponentClassifierImpl @Inject constructor(
     private fun getMaxResultFromFloatArray(array: FloatArray): IntArray {
         val sortedArray = array.sortedDescending()
         val indexMapper = hashMapOf<Float, Int>()
-        array.forEachIndexed {index, value ->
+        array.forEachIndexed { index, value ->
             indexMapper[value] = index
         }
         //get the indices of the elements with the highest probability

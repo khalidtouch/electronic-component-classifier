@@ -79,12 +79,12 @@ import java.time.LocalDateTime
 fun MainPreviewScreen(
     modifier: Modifier = Modifier,
     windowSizeClass: WindowSizeClass,
-    mainViewModel: MainViewModel = hiltViewModel<MainViewModel>(),
+    mainViewModel: MainViewModel,
     navController: NavHostController,
     onAbortApplication: () -> Unit = {},
     onSavePhotoFile: (File) -> Unit = {},
     onViewRecords: () -> Unit,
-    onPreviewWebInfo: (String) -> Unit,
+    onPreviewWebInfo: () -> Unit,
     cameraPermissionState: PermissionState = rememberPermissionState(
         Manifest.permission.CAMERA
     ),
@@ -93,20 +93,20 @@ fun MainPreviewScreen(
         maxHeight: Dp,
         rotationAngle: Float,
         isMinimized: Boolean,
-        testRecords: List<TestRecord>,
         onScale: () -> Unit,
         info: ComponentInfo,
-    ) -> Unit = { maxWidth, maxHeight, rotationAngle, minimized, records, onScale, info ->
+        openUrl: (String) -> Unit,
+    ) -> Unit = { maxWidth, maxHeight, rotationAngle, minimized, onScale, info, openUrl ->
         StaticBottomSheet(
             maxWidth = maxWidth,
             maxHeight = maxHeight,
             rotationAngle = rotationAngle,
             minimized = minimized,
-            testRecords = records,
             onScale = onScale,
             windowSizeClass = windowSizeClass,
             onPreviewWebInfo = onPreviewWebInfo,
             info = info,
+            openUrl = openUrl,
         )
     },
     gettingStartedContent: @Composable (
@@ -131,11 +131,9 @@ fun MainPreviewScreen(
         maxWidth: Dp,
         maxHeight: Dp,
         isMinimized: Boolean,
-        testRecords: List<TestRecord>,
         onScale: () -> Unit,
         gettingStartedState: Boolean,
         info: ComponentInfo,
-        bottomSheetVisibility: Boolean,
     ) -> Unit = { flashlightState,
                   onToggleFlashLight,
                   onTakeSnapshot,
@@ -144,11 +142,9 @@ fun MainPreviewScreen(
                   maxWidth,
                   maxHeight,
                   isMinimized,
-                  testRecords,
                   onScale,
                   gettingStartedState,
-                  info,
-                  bottomSheetVisibility ->
+                  info ->
         MainPreviewScreenContent(
             rotationAngle = rotationAngle,
             windowSizeClass = windowSizeClass,
@@ -163,14 +159,14 @@ fun MainPreviewScreen(
                     maxHeight = maxHeight,
                     rotationAngle = rotationAngle,
                     isMinimized = isMinimized,
-                    testRecords = testRecords,
                     onScale = onScale,
                     info = info,
+                    openUrl = mainViewModel::openWebUrl
                 )
             },
             gettingStartedState = gettingStartedState,
             onViewRecords = onViewRecords,
-            bottomSheetVisibility = bottomSheetVisibility,
+            isBottomSheetMinimized = isMinimized,
         )
     },
 ) {
@@ -185,9 +181,7 @@ fun MainPreviewScreen(
     val bottomSheetMinimized by mainViewModel.bottomSheetMinimized.collectAsState()
     val gettingStartedState by mainViewModel.gettingStartedState.collectAsStateWithLifecycle()
     var rotationAngle by remember { mutableStateOf(0f) }
-    val objectBoundingBoxes by mainViewModel.objectBoundingBoxes.collectAsStateWithLifecycle()
     val highestProbabilityComponent by mainViewModel.currentHighestProbabilityComponent.collectAsStateWithLifecycle()
-    val bottomSheetVisibilityState by mainViewModel.bottomSheetVisibilityState.collectAsStateWithLifecycle()
     val highestProbabilityComponentBuffer = remember {
         mutableStateOf<HighestProbabilityComponent>(
             HighestProbabilityComponent.Default
@@ -232,20 +226,19 @@ fun MainPreviewScreen(
         }
     }
 
-    LaunchedEffect(highestProbabilityComponent, gettingStartedState) {
+    LaunchedEffect(highestProbabilityComponent.label, gettingStartedState, bottomSheetMinimized) {
         //control the bottom sheet data and visibility
         Log.e(TAG, "MainPreviewScreen: bottom sheet effect called")
-        if(gettingStartedState) return@LaunchedEffect
-        if(highestProbabilityComponent == HighestProbabilityComponent.Default) return@LaunchedEffect
+        if (gettingStartedState) return@LaunchedEffect
+        if (highestProbabilityComponent == HighestProbabilityComponent.Default) return@LaunchedEffect
         delay(3_000)
-        if(!bottomSheetVisibilityState) {
+        if (bottomSheetMinimized) {
             highestProbabilityComponentBuffer.value = highestProbabilityComponent
-            mainViewModel.updateBottomSheetVisibility(true)
+            mainViewModel.onBottomSheetMinimizedChanged(false)
         }
     }
 
     DisposableEffect(Unit) {
-        mainViewModel.updateBottomSheetVisibility(false)
         orientationEventListener.enable()
         onDispose { orientationEventListener.disable() }
     }
@@ -331,6 +324,8 @@ fun MainPreviewScreen(
                     }
                 },
                 onTakeSnapshot = {
+                    mainViewModel.updateHighestProbabilityLabel(highestProbabilityComponent.label.uppercase())
+                    Log.e(TAG, "MainPreviewScreen: the current label is ${highestProbabilityComponent.label}")
                     coroutineScope.launch {
                         imageCaptureUseCase.value.takeSnapshot(context.executor)
                             .let(onSavePhotoFile)
@@ -342,7 +337,6 @@ fun MainPreviewScreen(
                 maxWidth = maxWidth,
                 maxHeight = maxHeight,
                 isMinimized = bottomSheetMinimized,
-                testRecords = records,
                 onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) },
                 gettingStartedState = gettingStartedState,
                 info = ComponentInfo(
@@ -351,13 +345,12 @@ fun MainPreviewScreen(
                     url = linker[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
                     dateTime = LocalDateTime.now(),
                 ),
-                bottomSheetVisibility = bottomSheetVisibilityState,
             )
 
             if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
                 //static bottom sheet
                 AnimatedVisibility(
-                    visible = bottomSheetVisibilityState,
+                    visible = !gettingStartedState,
                     enter = slideInVertically(
                         animationSpec = tween(
                             durationMillis = 200,
@@ -381,14 +374,14 @@ fun MainPreviewScreen(
                             maxHeight = maxHeight,
                             rotationAngle = rotationAngle,
                             isMinimized = bottomSheetMinimized,
-                            testRecords = records,
                             onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) },
                             info = ComponentInfo(
                                 componentName = highestProbabilityComponentBuffer.value.label.uppercase(),
                                 description = linker[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
                                 url = linker[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
                                 dateTime = LocalDateTime.now(),
-                            )
+                            ),
+                            openUrl = mainViewModel::openWebUrl,
                         )
                     }
                 }

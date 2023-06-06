@@ -55,11 +55,15 @@ fun HistoryListScreen(
         items(history) { item ->
             HistoryListItem(
                 item = HistoryItem(
+                    id = item?.historyId ?: -1L,
                     componentName = item?.componentName ?: stringResource(id = R.string.component),
                     dateTime = item?.dateTime ?: LocalDateTime.now(),
                     value = "",
                 ),
-                onClick
+                onClick = {
+                    mainViewModel.navigateToHistoryDetails(it.id)
+                    onClick(it)
+                }
             )
         }
     }
@@ -148,7 +152,17 @@ private fun ListItemWrapper(
 
 
 data class HistoryItem(
+    val id: Long,
     val componentName: String,
     val value: String,
     val dateTime: LocalDateTime,
-)
+) {
+    companion object {
+        val Default = HistoryItem(
+            id = -1L,
+            componentName = "",
+            value= "",
+            dateTime = LocalDateTime.MIN,
+        )
+    }
+}

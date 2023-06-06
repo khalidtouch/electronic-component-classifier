@@ -6,31 +6,38 @@ import java.time.LocalDateTime
 
 val fakeHistoryItem = listOf<HistoryItem>(
     HistoryItem(
+        id = 43424L,
         componentName = "Resistor",
         value = "220Ohm",
         dateTime = LocalDateTime.now(),
     ),
     HistoryItem(
+        id = 43424L,
+        componentName = "Resistor",
+        value = "220Ohm",
+        dateTime = LocalDateTime.now(),
+    ),
+
+    HistoryItem(
+        id = 43424L,
         componentName = "Resistor",
         value = "220Ohm",
         dateTime = LocalDateTime.now(),
     ),
     HistoryItem(
+        id = 43424L,
         componentName = "Resistor",
         value = "220Ohm",
         dateTime = LocalDateTime.now(),
     ),
     HistoryItem(
+        id = 43424L,
         componentName = "Resistor",
         value = "220Ohm",
         dateTime = LocalDateTime.now(),
     ),
     HistoryItem(
-        componentName = "Resistor",
-        value = "220Ohm",
-        dateTime = LocalDateTime.now(),
-    ),
-    HistoryItem(
+        id = 43424L,
         componentName = "Resistor",
         value = "220Ohm",
         dateTime = LocalDateTime.now(),

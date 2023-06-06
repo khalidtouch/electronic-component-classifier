@@ -45,7 +45,7 @@ fun MainPreviewScreenContent(
     modifier: Modifier = Modifier,
     rotationAngle: Float,
     gettingStartedState: Boolean,
-    bottomSheetVisibility: Boolean,
+    isBottomSheetMinimized: Boolean,
     windowSizeClass: WindowSizeClass,
     onClose: () -> Unit = {},
     onToggleFlashLight: () -> Unit = {},
@@ -89,7 +89,7 @@ fun MainPreviewScreenContent(
             }
             if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact) {
                 androidx.compose.animation.AnimatedVisibility(
-                    visible = bottomSheetVisibility,
+                    visible = !gettingStartedState,
                     enter = slideInHorizontally(
                         animationSpec = tween(
                             durationMillis = 200,

@@ -1,6 +1,6 @@
 package com.nkoyo.componentidentifier.data.di
 
-import com.nkoyo.componentidentifier.data.repository.HistoryRepositoryImpl
+import com.nkoyo.componentidentifier.data.repository.OfflineFirstHistoryRepository
 import com.nkoyo.componentidentifier.domain.repository.HistoryRepository
 import dagger.Binds
 import dagger.Module
@@ -13,5 +13,5 @@ import javax.inject.Singleton
 abstract class RepositoryModule {
     @Binds
     @Singleton
-    abstract fun bindHistoryRepository(impl: HistoryRepositoryImpl): HistoryRepository
+    abstract fun bindHistoryRepository(impl: OfflineFirstHistoryRepository): HistoryRepository
 }

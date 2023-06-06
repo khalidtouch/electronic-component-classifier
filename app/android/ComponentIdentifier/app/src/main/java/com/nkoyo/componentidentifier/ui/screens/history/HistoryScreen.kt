@@ -154,6 +154,7 @@ private fun HistoryScreenContent(
                 HistoryDetailsScreen(
                     windowSizeClass = windowSizeClass,
                     fullWidth = configuration.screenWidthDp.dp,
+                    mainViewModel = mainViewModel
                 )
             }
         }

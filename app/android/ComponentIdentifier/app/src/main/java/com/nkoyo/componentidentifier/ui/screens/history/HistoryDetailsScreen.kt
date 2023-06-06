@@ -2,6 +2,7 @@ package com.nkoyo.componentidentifier.ui.screens.history
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,12 +40,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.nkoyo.componentidentifier.R
+import com.nkoyo.componentidentifier.database.HistoryEntity
 import com.nkoyo.componentidentifier.domain.extensions.asString
 import com.nkoyo.componentidentifier.ui.components.NkSearchBar
 import com.nkoyo.componentidentifier.ui.components.NkSimpleTopBar
+import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
+import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
 
 
@@ -47,14 +57,23 @@ import java.time.LocalDateTime
 @Composable
 fun HistoryDetailsScreen(
     windowSizeClass: WindowSizeClass,
+    mainViewModel: MainViewModel,
     fullWidth: Dp = Dp.Unspecified,
     onBackPressed: () -> Unit = {},
     iconColors: IconButtonColors = IconButtonDefaults.iconButtonColors(
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.outline,
     ),
+) {
+    val TAG = "HistoryDetail"
+    val historyId by mainViewModel.selectedHistoryId.collectAsStateWithLifecycle()
+    val historyEntity by mainViewModel.selectedHistoryEntity.collectAsStateWithLifecycle()
 
-    ) {
+    LaunchedEffect(historyId) {
+        Log.e(TAG, "HistoryDetailsScreen: LaunchedEffect been called")
+        mainViewModel.findByComponentId(historyId)
+    }
+
     Scaffold(
         topBar = {
             if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
@@ -95,23 +114,15 @@ fun HistoryDetailsScreen(
                 LazyColumn(
                     Modifier
                         .fillMaxSize()
-                        .padding(16.dp)) {
-                    val detail = HistoryDetailItem(
-                        historyItem = HistoryItem(
-                            componentName = "Resistor",
-                            value = "230Ohms",
-                            dateTime = LocalDateTime.now(),
-                        ),
-                        imageUri = Uri.parse("https://img.freepik.com/free-photo/isolated-happy-smiling-dog-white-background-portrait-4_1562-693.jpg")
-                    )
-
+                        .padding(start = 16.dp, end = 16.dp, bottom = 32.dp )
+                ) {
                     image(
-                        detail = detail,
+                        detail = historyEntity?.asDetailItem().orDefault(),
                         fullWidth = fullWidth,
                         windowSizeClass = windowSizeClass,
                     )
                     info(
-                        detail = detail,
+                        detail = historyEntity?.asDetailItem().orDefault(),
                     )
                 }
             }
@@ -174,4 +185,33 @@ private fun LazyListScope.info(
 data class HistoryDetailItem(
     val historyItem: HistoryItem,
     val imageUri: Uri,
-)
+) {
+    companion object {
+        val Default = HistoryDetailItem(
+            historyItem = HistoryItem.Default,
+            imageUri = Uri.parse("")
+        )
+    }
+}
+
+fun HistoryDetailItem.asEntity() =
+     HistoryEntity(
+         historyId = historyItem.id,
+         componentName = historyItem.componentName,
+         dateTime = historyItem.dateTime,
+         imageUrl = imageUri.toString()
+     )
+
+fun HistoryEntity.asDetailItem() =
+    HistoryDetailItem(
+        historyItem = HistoryItem(
+            id = historyId,
+            componentName = componentName,
+            value  ="",
+            dateTime = dateTime,
+        ),
+        imageUri = Uri.parse(imageUrl)
+    )
+
+
+fun HistoryDetailItem?.orDefault() = this ?: HistoryDetailItem.Default

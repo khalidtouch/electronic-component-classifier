@@ -16,7 +16,8 @@ interface HistoryRepository {
 
     fun findByComponentName(componentName: String): Flow<List<HistoryEntity>>
 
-    fun showHistory(): Flow<List<HistoryEntity>>
+    fun findByComponentId(id : Long): Flow<HistoryEntity?>
 
+    fun showHistory(): Flow<List<HistoryEntity>>
 
 }
