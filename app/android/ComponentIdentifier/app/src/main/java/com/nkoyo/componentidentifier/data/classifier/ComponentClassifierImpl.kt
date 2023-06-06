@@ -50,8 +50,8 @@ class ComponentClassifierImpl @Inject constructor(
     override fun initialize() {
         try {
             val assetManager = context.assets
-            val model = loadModelFile(assetManager, MODEL_FILENAME_TEST) ?: return
-            labels = loadLabelData(context, LABEL_FILENAME)
+            val model = loadModelFile(assetManager, MODEL_FILENAME_2) ?: return
+            labels = loadLabelData(context, LABEL_FILENAME_2)
             val compatibilityList = CompatibilityList()
             val options = Interpreter.Options().apply {
                 if (compatibilityList.isDelegateSupportedOnThisDevice) {

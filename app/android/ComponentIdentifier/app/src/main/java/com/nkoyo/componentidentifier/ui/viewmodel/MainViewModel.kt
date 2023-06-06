@@ -63,8 +63,9 @@ class MainViewModel @Inject constructor(
         initialize() //initialize Classifier
     }
 
-    val cameraSelector: CameraSelector = CameraSelector.Builder()
-        .requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
+    private val _cameraSelector =
+        MutableStateFlow<CameraSelector>(CameraSelector.DEFAULT_BACK_CAMERA)
+    val cameraSelector: StateFlow<CameraSelector> = _cameraSelector
 
     private var _flashLightState =
         MutableStateFlow(ImageCaptureFlashMode.Auto as ImageCaptureFlashMode)
@@ -126,8 +127,14 @@ class MainViewModel @Inject constructor(
         Log.e(TAG, "onTestRecordsChanged: testRecords size is ${_testRecords.value.size}")
     }
 
-    private fun onCameraSelectorChanged(selector: CameraSelector) {
-        // _cameraSelector.value = selector
+    fun onToggleCameraSelector(selector: CameraSelector) {
+        when (selector) {
+            CameraSelector.DEFAULT_BACK_CAMERA -> _cameraSelector.value =
+                CameraSelector.DEFAULT_FRONT_CAMERA
+
+            CameraSelector.DEFAULT_FRONT_CAMERA -> _cameraSelector.value =
+                CameraSelector.DEFAULT_BACK_CAMERA
+        }
     }
 
     fun updateHighestProbabilityLabel(label: String) {
