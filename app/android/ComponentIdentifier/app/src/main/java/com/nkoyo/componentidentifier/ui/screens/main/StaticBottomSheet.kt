@@ -125,14 +125,16 @@ fun StaticBottomSheet(
                     )
                     Spacer(Modifier.height(24.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        SecondaryButton(
-                            label = stringResource(id = R.string.read_more),
-                            onClick = {
-                                openUrl(info.url)
-                                onPreviewWebInfo()
-                            },
-                            contentColor = MaterialTheme.colorScheme.outline,
-                        )
+                       if(info.componentName.isNotBlank()) {
+                           SecondaryButton(
+                               label = stringResource(id = R.string.read_more),
+                               onClick = {
+                                   openUrl(info.url)
+                                   onPreviewWebInfo()
+                               },
+                               contentColor = MaterialTheme.colorScheme.outline,
+                           )
+                       }
                     }
                 }
             }
