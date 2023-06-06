@@ -5,5 +5,5 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 fun LocalDateTime.asString() =
-    DateTimeFormatter.ofPattern("dd MMM, yyyy H:mma", Locale.getDefault())
+    DateTimeFormatter.ofPattern("dd MMM, yyyy h:mma", Locale.getDefault())
         .format(this)
