@@ -61,7 +61,7 @@ import com.nkoyo.componentidentifier.domain.usecases.CameraPreviewUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageAnalysisUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
-import com.nkoyo.componentidentifier.network.linker
+import com.nkoyo.componentidentifier.network.linker2
 import com.nkoyo.componentidentifier.ui.components.TestRecord
 import com.nkoyo.componentidentifier.ui.viewmodel.HighestProbabilityComponent
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
@@ -175,7 +175,7 @@ fun MainPreviewScreen(
     val configuration = LocalConfiguration.current
     val coroutineScope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
-    val cameraSelector = mainViewModel.cameraSelector
+    val cameraSelector by mainViewModel.cameraSelector.collectAsStateWithLifecycle()
     val cameraExecutor = mainViewModel.cameraExecutor
     val flashLightExecutor = mainViewModel.flashLightExecutor
     val bottomSheetMinimized by mainViewModel.bottomSheetMinimized.collectAsState()
@@ -239,6 +239,7 @@ fun MainPreviewScreen(
     }
 
     DisposableEffect(Unit) {
+        mainViewModel.onBottomSheetMinimizedChanged(true)
         orientationEventListener.enable()
         onDispose { orientationEventListener.disable() }
     }
@@ -332,7 +333,7 @@ fun MainPreviewScreen(
                     }
                 },
                 onToggleCamera = {
-                    //TODO()
+                    mainViewModel.onToggleCameraSelector(cameraSelector)
                 },
                 maxWidth = maxWidth,
                 maxHeight = maxHeight,
@@ -341,8 +342,8 @@ fun MainPreviewScreen(
                 gettingStartedState = gettingStartedState,
                 info = ComponentInfo(
                     componentName = highestProbabilityComponentBuffer.value.label.uppercase(),
-                    description = linker[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
-                    url = linker[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
+                    description = linker2[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
+                    url = linker2[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
                     dateTime = LocalDateTime.now(),
                 ),
             )
@@ -377,8 +378,8 @@ fun MainPreviewScreen(
                             onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) },
                             info = ComponentInfo(
                                 componentName = highestProbabilityComponentBuffer.value.label.uppercase(),
-                                description = linker[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
-                                url = linker[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
+                                description = linker2[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
+                                url = linker2[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
                                 dateTime = LocalDateTime.now(),
                             ),
                             openUrl = mainViewModel::openWebUrl,
