@@ -1,4 +1,4 @@
-Battries
+Batteries
 Capacitor
 Cartridge_fuse
 Circuit_breaker
