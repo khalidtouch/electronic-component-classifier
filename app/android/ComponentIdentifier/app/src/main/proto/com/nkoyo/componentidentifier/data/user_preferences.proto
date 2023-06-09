@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+import "com/nkoyo/componentidentifier/data/dark_theme_config.proto";
+
+option java_package = "com.nkoyo.componentidentifier";
+option java_multiple_files = true;
+
+message UserPreferences {
+  DarkThemeConfigProto dark_theme_config = 1;
+}

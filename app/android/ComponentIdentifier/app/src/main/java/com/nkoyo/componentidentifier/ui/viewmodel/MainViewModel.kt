@@ -80,6 +80,12 @@ class MainViewModel @Inject constructor(
     private var _bottomSheetMinimized = MutableStateFlow(true)
     val bottomSheetMinimized: StateFlow<Boolean> = _bottomSheetMinimized
 
+    private var _classificationState = MutableStateFlow(true)
+    val classificationState: StateFlow<Boolean> = _classificationState
+
+    private var _menuState = MutableStateFlow(true)
+    val menuState: StateFlow<Boolean> = _menuState
+
     private val _gettingStartedState = MutableStateFlow<Boolean>(true)
     val gettingStartedState: StateFlow<Boolean> = _gettingStartedState
 
@@ -125,6 +131,10 @@ class MainViewModel @Inject constructor(
     fun onTestRecordsChanged(records: List<TestRecord>) {
         _testRecords.value = records.toMutableList()
         Log.e(TAG, "onTestRecordsChanged: testRecords size is ${_testRecords.value.size}")
+    }
+
+    fun updateClassificationState(state: Boolean) {
+        _classificationState.value = state
     }
 
     fun onToggleCameraSelector(selector: CameraSelector) {
