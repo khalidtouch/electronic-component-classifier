@@ -1,11 +1,5 @@
 package com.nkoyo.componentidentifier.ui.screens.history
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,8 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -52,9 +44,9 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Popup
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nkoyo.componentidentifier.R
-import com.nkoyo.componentidentifier.data.fake.fakeHistoryItem
-import com.nkoyo.componentidentifier.ui.components.CircleIconButton
 import com.nkoyo.componentidentifier.ui.components.DarkModeConfigSettingsPane
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import com.nkoyo.componentidentifier.ui.components.NkSearchBar
 import com.nkoyo.componentidentifier.ui.components.NkSimpleTopBar
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
@@ -276,16 +268,20 @@ private fun HistoryScreenContent(
         val configuration = LocalConfiguration.current
 
         HistoryListScreen(onClick = onClick, mainViewModel = mainViewModel)
+        Row(Modifier.fillMaxSize().padding(top = 32.dp)) {
+            val configuration = LocalConfiguration.current
 
-        if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact) {
-            Box(Modifier.width(configuration.screenWidthDp.dp.times(0.67f))) {
-                HistoryDetailsScreen(
-                    windowSizeClass = windowSizeClass,
-                    fullWidth = configuration.screenWidthDp.dp,
-                    mainViewModel = mainViewModel
-                )
+            HistoryListScreen(onClick = onClick, mainViewModel = mainViewModel)
+
+            if (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact) {
+                Box(Modifier.width(configuration.screenWidthDp.dp.times(0.67f))) {
+                    HistoryDetailsScreen(
+                        windowSizeClass = windowSizeClass,
+                        fullWidth = configuration.screenWidthDp.dp,
+                        mainViewModel = mainViewModel
+                    )
+                }
             }
         }
     }
 }
-

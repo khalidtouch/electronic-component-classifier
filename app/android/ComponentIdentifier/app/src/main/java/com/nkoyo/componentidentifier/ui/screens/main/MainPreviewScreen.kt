@@ -20,6 +20,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+<<<<<<< HEAD
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
+=======
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,11 +50,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+<<<<<<< HEAD
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+=======
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -187,7 +198,10 @@ fun MainPreviewScreen(
     val cameraExecutor = mainViewModel.cameraExecutor
     val flashLightExecutor = mainViewModel.flashLightExecutor
     val bottomSheetMinimized by mainViewModel.bottomSheetMinimized.collectAsState()
+<<<<<<< HEAD
     val classificationState by mainViewModel.classificationState.collectAsStateWithLifecycle()
+=======
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
     val gettingStartedState by mainViewModel.gettingStartedState.collectAsStateWithLifecycle()
     var rotationAngle by remember { mutableStateOf(0f) }
     val highestProbabilityComponent by mainViewModel.currentHighestProbabilityComponent.collectAsStateWithLifecycle()
@@ -196,7 +210,10 @@ fun MainPreviewScreen(
             HighestProbabilityComponent.Default
         )
     }
+<<<<<<< HEAD
     var progressWheel by remember { mutableStateOf(false) }
+=======
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
 
     val previewView: PreviewView = remember {
         val view = PreviewView(context).apply {
@@ -217,6 +234,10 @@ fun MainPreviewScreen(
         remember(flashLightState) { mutableStateOf(ImageCaptureUseCase().of(flashLightState)) }
     val imageAnalysisUseCase =
         remember { mutableStateOf(ImageAnalysisUseCase().of(Size(point.x, point.y))) }
+<<<<<<< HEAD
+=======
+    var records by remember { mutableStateOf<List<TestRecord>>(listOf()) }
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
 
     val orientationEventListener by lazy {
         object : OrientationEventListener(context) {
@@ -235,6 +256,7 @@ fun MainPreviewScreen(
         }
     }
 
+<<<<<<< HEAD
     LaunchedEffect(
         highestProbabilityComponent.label,
         gettingStartedState,
@@ -246,11 +268,19 @@ fun MainPreviewScreen(
         if (!classificationState) {
             mainViewModel.onBottomSheetMinimizedChanged(true)
         }
+=======
+    LaunchedEffect(highestProbabilityComponent.label, gettingStartedState, bottomSheetMinimized) {
+        //control the bottom sheet data and visibility
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
         Log.e(TAG, "MainPreviewScreen: bottom sheet effect called")
         if (gettingStartedState) return@LaunchedEffect
         if (highestProbabilityComponent == HighestProbabilityComponent.Default) return@LaunchedEffect
         delay(3_000)
+<<<<<<< HEAD
         if (classificationState && bottomSheetMinimized) {
+=======
+        if (bottomSheetMinimized) {
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
             highestProbabilityComponentBuffer.value = highestProbabilityComponent
             mainViewModel.onBottomSheetMinimizedChanged(false)
         }
@@ -258,7 +288,10 @@ fun MainPreviewScreen(
 
     DisposableEffect(Unit) {
         mainViewModel.onBottomSheetMinimizedChanged(true)
+<<<<<<< HEAD
         mainViewModel.updateClassificationState(true)
+=======
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
         orientationEventListener.enable()
         onDispose { orientationEventListener.disable() }
     }
@@ -345,10 +378,14 @@ fun MainPreviewScreen(
                 },
                 onTakeSnapshot = {
                     mainViewModel.updateHighestProbabilityLabel(highestProbabilityComponent.label.uppercase())
+<<<<<<< HEAD
                     Log.e(
                         TAG,
                         "MainPreviewScreen: the current label is ${highestProbabilityComponent.label}"
                     )
+=======
+                    Log.e(TAG, "MainPreviewScreen: the current label is ${highestProbabilityComponent.label}")
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
                     coroutineScope.launch {
                         imageCaptureUseCase.value.takeSnapshot(context.executor)
                             .let(onSavePhotoFile)
@@ -397,9 +434,13 @@ fun MainPreviewScreen(
                             maxHeight = maxHeight,
                             rotationAngle = rotationAngle,
                             isMinimized = bottomSheetMinimized,
+<<<<<<< HEAD
                             onScale = {
                                 mainViewModel.updateClassificationState(!classificationState)
                             },
+=======
+                            onScale = { mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized) },
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
                             info = ComponentInfo(
                                 componentName = highestProbabilityComponentBuffer.value.label.uppercase(),
                                 description = linker2[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
@@ -411,6 +452,7 @@ fun MainPreviewScreen(
                     }
                 }
             }
+<<<<<<< HEAD
 
             if(progressWheel) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -434,6 +476,8 @@ fun MainPreviewScreen(
                     }
                 }
             }
+=======
+>>>>>>> 28240695716df0a398d4c670a068ce838539d773
         }
     }
 }

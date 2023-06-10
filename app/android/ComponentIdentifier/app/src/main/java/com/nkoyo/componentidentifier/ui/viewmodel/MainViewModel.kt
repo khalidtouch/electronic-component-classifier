@@ -3,11 +3,6 @@ package com.nkoyo.componentidentifier.ui.viewmodel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ImageFormat
-import android.graphics.Rect
-import android.graphics.YuvImage
-import android.media.Image
 import android.util.Log
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
@@ -15,17 +10,7 @@ import androidx.camera.view.PreviewView
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.google.mlkit.common.model.LocalModel
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.objects.DetectedObject
-import com.google.mlkit.vision.objects.ObjectDetection
-import com.google.mlkit.vision.objects.ObjectDetector
-import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
-import com.nkoyo.componentidentifier.UserPreferences
-import com.nkoyo.componentidentifier.data.classifier.MODEL_FILENAME_TEST
 import com.nkoyo.componentidentifier.database.HistoryDao
 import com.nkoyo.componentidentifier.database.HistoryEntity
 import com.nkoyo.componentidentifier.datastore.DarkThemeConfig
@@ -45,6 +30,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -242,7 +228,6 @@ class MainViewModel @Inject constructor(
     fun updateDarkThemeConfigState(state: DarkThemeConfig) {
         viewModelScope.launch { preferences.updateDarkThemeConfig(state) }
     }
-
 }
 
 
