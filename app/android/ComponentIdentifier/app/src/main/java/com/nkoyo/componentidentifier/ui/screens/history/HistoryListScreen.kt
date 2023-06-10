@@ -36,6 +36,7 @@ import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 import java.time.LocalDateTime
 import androidx.paging.compose.items
 import com.nkoyo.componentidentifier.R
+import com.nkoyo.componentidentifier.ui.theme.LocalBackgroundTheme
 
 @Composable
 fun HistoryListScreen(
@@ -113,8 +114,8 @@ private fun ListItemWrapper(
             role = Role.Button,
         ),
         shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.outline,
+        color = LocalBackgroundTheme.current.surface,
+        contentColor = LocalBackgroundTheme.current.outline,
         border = BorderStroke(
             width = 1.dp,
             color = MaterialTheme.colorScheme.secondary

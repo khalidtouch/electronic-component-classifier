@@ -10,6 +10,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +20,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.datastore.DarkThemeConfig
+import com.nkoyo.componentidentifier.ui.theme.LocalBackgroundTheme
 
 
 @Composable
@@ -65,7 +67,11 @@ fun DarkModeConfigRowChoose(
         RadioButton(
             selected = selected,
             onClick = null,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            colors = RadioButtonDefaults.colors(
+                selectedColor = LocalBackgroundTheme.current.outline,
+                unselectedColor = LocalBackgroundTheme.current.outline.copy(0.5f)
+            )
         )
         Spacer(Modifier.width(16.dp))
         Text(

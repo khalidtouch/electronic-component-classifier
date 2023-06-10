@@ -23,6 +23,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -48,6 +49,7 @@ import com.nkoyo.componentidentifier.database.HistoryEntity
 import com.nkoyo.componentidentifier.domain.extensions.asString
 import com.nkoyo.componentidentifier.ui.components.NkSearchBar
 import com.nkoyo.componentidentifier.ui.components.NkSimpleTopBar
+import com.nkoyo.componentidentifier.ui.theme.LocalBackgroundTheme
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
@@ -62,7 +64,7 @@ fun HistoryDetailsScreen(
     onBackPressed: () -> Unit = {},
     iconColors: IconButtonColors = IconButtonDefaults.iconButtonColors(
         containerColor = Color.Transparent,
-        contentColor = MaterialTheme.colorScheme.outline,
+        contentColor = LocalBackgroundTheme.current.outline,
     ),
 ) {
     val TAG = "HistoryDetail"
@@ -75,9 +77,18 @@ fun HistoryDetailsScreen(
     }
 
     Scaffold(
+        containerColor = LocalBackgroundTheme.current.surface,
+        contentColor = LocalBackgroundTheme.current.outline,
         topBar = {
             if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
                 NkSimpleTopBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = LocalBackgroundTheme.current.surface,
+                        scrolledContainerColor = LocalBackgroundTheme.current.surface,
+                        navigationIconContentColor = LocalBackgroundTheme.current.outline,
+                        titleContentColor = LocalBackgroundTheme.current.outline,
+                        actionIconContentColor = LocalBackgroundTheme.current.outline,
+                    ),
                     title = {
                         Row(
                             Modifier.fillMaxWidth(),
@@ -114,7 +125,7 @@ fun HistoryDetailsScreen(
                 LazyColumn(
                     Modifier
                         .fillMaxSize()
-                        .padding(start = 16.dp, end = 16.dp, bottom = 32.dp )
+                        .padding(start = 16.dp, end = 16.dp, bottom = 32.dp)
                 ) {
                     image(
                         detail = historyEntity?.asDetailItem().orDefault(),

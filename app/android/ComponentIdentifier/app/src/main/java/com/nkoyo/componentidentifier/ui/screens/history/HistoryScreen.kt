@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -49,6 +50,7 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import com.nkoyo.componentidentifier.ui.components.NkSearchBar
 import com.nkoyo.componentidentifier.ui.components.NkSimpleTopBar
+import com.nkoyo.componentidentifier.ui.theme.LocalBackgroundTheme
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 
 
@@ -62,7 +64,7 @@ fun HistoryScreen(
     onHistoryDetails: () -> Unit,
     iconColors: IconButtonColors = IconButtonDefaults.iconButtonColors(
         containerColor = Color.Transparent,
-        contentColor = MaterialTheme.colorScheme.outline,
+        contentColor = LocalBackgroundTheme.current.outline,
     )
 ) {
     val configuration = LocalConfiguration.current
@@ -71,9 +73,17 @@ fun HistoryScreen(
     val darkThemeConfigSettings by mainViewModel.darkThemeConfigSettings.collectAsStateWithLifecycle()
 
     Scaffold(
+        containerColor = LocalBackgroundTheme.current.surface,
         modifier = Modifier,
         topBar = {
             NkSimpleTopBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = LocalBackgroundTheme.current.surface,
+                    scrolledContainerColor = LocalBackgroundTheme.current.surface,
+                    navigationIconContentColor = LocalBackgroundTheme.current.outline,
+                    titleContentColor = LocalBackgroundTheme.current.outline,
+                    actionIconContentColor = LocalBackgroundTheme.current.outline,
+                ),
                 title = {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(
@@ -140,8 +150,7 @@ fun HistoryScreen(
                 }
             )
         },
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.outline,
+        contentColor = LocalBackgroundTheme.current.outline,
         content = {
             HistoryScreenContent(
                 modifier = Modifier.padding(it),
@@ -163,12 +172,16 @@ fun HistoryScreen(
         Box(contentAlignment = Alignment.TopEnd, modifier = Modifier.fillMaxSize()) {
             Popup(
                 alignment = Alignment.TopCenter,
-                offset = IntOffset(0, 30),
+                offset = IntOffset(200, 30),
                 onDismissRequest = { onDismiss() }
             ) {
                 Card(
                     shape = RoundedCornerShape(8.dp),
                     elevation = CardDefaults.cardElevation(2.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = LocalBackgroundTheme.current.surfaceVariant,
+                        contentColor = LocalBackgroundTheme.current.onSurfaceVariant,
+                    )
                 ) {
                     Box(
                         Modifier.clickable(
@@ -182,7 +195,7 @@ fun HistoryScreen(
                         Text(
                             text = stringResource(id = R.string.dark_theme),
                             style = MaterialTheme.typography.labelLarge.copy(
-                                color = MaterialTheme.colorScheme.outline.copy(0.7f)
+                                color = LocalBackgroundTheme.current.onSurfaceVariant
                             ),
                             modifier = Modifier.padding(16.dp)
                         )
@@ -197,6 +210,9 @@ fun HistoryScreen(
 
         Box(Modifier.fillMaxSize()) {
             AlertDialog(
+                containerColor = LocalBackgroundTheme.current.surfaceVariant,
+                textContentColor = LocalBackgroundTheme.current.onSurfaceVariant,
+                titleContentColor = LocalBackgroundTheme.current.onSurfaceVariant,
                 onDismissRequest = { dismissDialog() },
                 confirmButton = {
                     TextButton(
@@ -209,7 +225,7 @@ fun HistoryScreen(
                         },
                         colors = ButtonDefaults.textButtonColors(
                             containerColor = Color.Transparent,
-                            contentColor = MaterialTheme.colorScheme.outline
+                            contentColor = LocalBackgroundTheme.current.onSurfaceVariant
                         )
                     )
                 },
@@ -224,7 +240,7 @@ fun HistoryScreen(
                         },
                         colors = ButtonDefaults.textButtonColors(
                             containerColor = Color.Transparent,
-                            contentColor = MaterialTheme.colorScheme.outline
+                            contentColor = LocalBackgroundTheme.current.onSurfaceVariant
                         )
                     )
                 },
@@ -268,7 +284,10 @@ private fun HistoryScreenContent(
         val configuration = LocalConfiguration.current
 
         HistoryListScreen(onClick = onClick, mainViewModel = mainViewModel)
-        Row(Modifier.fillMaxSize().padding(top = 32.dp)) {
+        Row(
+            Modifier
+                .fillMaxSize()
+                .padding(top = 32.dp)) {
 
             HistoryListScreen(onClick = onClick, mainViewModel = mainViewModel)
 

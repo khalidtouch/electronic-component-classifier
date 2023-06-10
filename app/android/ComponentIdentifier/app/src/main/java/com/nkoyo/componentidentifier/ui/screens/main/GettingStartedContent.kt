@@ -36,6 +36,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.ui.components.SecondaryButton
 import com.nkoyo.componentidentifier.ui.components.TertiaryButton
+import com.nkoyo.componentidentifier.ui.theme.LocalBackgroundTheme
 
 
 @Composable
@@ -63,6 +64,10 @@ fun GettingStartedContent(
             contentAlignment = Alignment.Center
         ) {
             Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = LocalBackgroundTheme.current.surfaceVariant,
+                    contentColor = LocalBackgroundTheme.current.onSurfaceVariant,
+                ),
                 modifier = modifier
                     .width(
                         when (windowSizeClass.widthSizeClass) {
@@ -91,7 +96,7 @@ fun GettingStartedContent(
                     hoveredElevation = 0.dp,
                 )
             ) {
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onPrimary) {
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                     Column(
                         modifier = modifier
                             .fillMaxWidth()
@@ -104,6 +109,7 @@ fun GettingStartedContent(
                             text = stringResource(id = R.string.developer_name),
                             style = MaterialTheme.typography.headlineLarge.copy(
                                 fontWeight = FontWeight.ExtraBold,
+                                color = LocalBackgroundTheme.current.onSurfaceVariant,
                             )
                         )
                         Spacer(Modifier.height(4.dp))
@@ -111,12 +117,15 @@ fun GettingStartedContent(
                             text = stringResource(id = R.string.mat_no),
                             style = MaterialTheme.typography.headlineSmall.copy(
                                 fontWeight = FontWeight.Bold,
+                                color = LocalBackgroundTheme.current.onSurfaceVariant,
                             )
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = stringResource(id = R.string.developer_location),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = LocalBackgroundTheme.current.onSurfaceVariant,
+                            )
                         )
                         Spacer(Modifier.height(72.dp))
                         Box(
@@ -125,7 +134,9 @@ fun GettingStartedContent(
                         ) {
                             Text(
                                 text = valueMessage,
-                                style = MaterialTheme.typography.bodyLarge,
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    color = LocalBackgroundTheme.current.onSurfaceVariant,
+                                ),
                             )
                         }
 
@@ -137,14 +148,14 @@ fun GettingStartedContent(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             TertiaryButton(
-                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                contentColor =LocalBackgroundTheme.current.onSurfaceVariant,
                                 label = stringResource(id = R.string.abort),
                                 onClick = onAbort,
                             )
 
                             SecondaryButton(
-                                containerColor = MaterialTheme.colorScheme.onPrimary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = LocalBackgroundTheme.current.onSurfaceVariant,
+                                contentColor = LocalBackgroundTheme.current.onSurfaceVariant,
                                 label = stringResource(id = R.string.get_started),
                                 onClick = onGettingApplicationStarted,
                             )

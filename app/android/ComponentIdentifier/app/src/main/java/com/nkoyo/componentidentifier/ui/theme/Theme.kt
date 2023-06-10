@@ -10,6 +10,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -68,8 +69,8 @@ val DarkColorScheme = darkColorScheme(
     onBackground = Color.White,
     surface = DarkGreenGray10,
     onSurface = Color.White,
-    surfaceVariant = Purple95,
-    onSurfaceVariant = Color.Black,
+    surfaceVariant = DarkPurpleGray10,
+    onSurfaceVariant = Color.White,
     inverseSurface = Purple30,
     inverseOnSurface = Color.White,
     outline = White,
@@ -101,16 +102,26 @@ fun ComponentIdentifierTheme(
     }
 
     val systemUiController = rememberSystemUiController()
-    val outlineColor = MaterialTheme.colorScheme.outline
+    val surfaceColor = MaterialTheme.colorScheme.surface
     SideEffect {
         systemUiController.apply {
-            setStatusBarColor(color = outlineColor)
+            setStatusBarColor(color = surfaceColor)
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = NkTypography,
-        content = content
-    )
+    CompositionLocalProvider(LocalBackgroundTheme provides NkBackgroundTheme(
+        surface = MaterialTheme.colorScheme.surface,
+        outline = MaterialTheme.colorScheme.outline,
+        primary = MaterialTheme.colorScheme.primary,
+        onPrimary = MaterialTheme.colorScheme.onPrimary,
+        onSurface = MaterialTheme.colorScheme.onSurface,
+        onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant,
+        surfaceVariant = MaterialTheme.colorScheme.surfaceVariant,
+    )) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = NkTypography,
+            content = content
+        )
+    }
 }

@@ -13,12 +13,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.ui.components.CircleIconButton
+import com.nkoyo.componentidentifier.ui.theme.LocalBackgroundTheme
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 
 
@@ -41,6 +43,7 @@ fun WebInfoScreen(
                 )
                 webViewClient = WebViewClient()
                 loadUrl(url)
+                setBackgroundColor(Color.Blue.toArgb())
             }
         },
             update = { webView ->

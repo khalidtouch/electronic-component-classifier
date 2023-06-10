@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.nkoyo.componentidentifier.R
+import com.nkoyo.componentidentifier.ui.theme.LocalBackgroundTheme
 
 @Composable
 fun SecondaryButton(
@@ -39,8 +40,8 @@ fun SecondaryButton(
     label: String,
     style: TextStyle = MaterialTheme.typography.labelLarge,
     onClick: () -> Unit = {},
-    contentColor: Color = MaterialTheme.colorScheme.outline,
-    containerColor: Color = MaterialTheme.colorScheme.outline,
+    contentColor: Color = LocalBackgroundTheme.current.outline,
+    containerColor: Color = LocalBackgroundTheme.current.outline,
 ){
     OutlinedButton(
         modifier = modifier.clip(CircleShape),

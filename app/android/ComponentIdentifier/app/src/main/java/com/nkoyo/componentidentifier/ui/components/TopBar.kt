@@ -8,6 +8,7 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.nkoyo.componentidentifier.ui.theme.LocalBackgroundTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -15,11 +16,11 @@ import androidx.compose.ui.Modifier
 fun NkSimpleTopBar(
     modifier: Modifier = Modifier,
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(
-        containerColor = MaterialTheme.colorScheme.surface,
-        scrolledContainerColor = MaterialTheme.colorScheme.surface,
-        navigationIconContentColor = MaterialTheme.colorScheme.outline,
-        titleContentColor = MaterialTheme.colorScheme.outline,
-        actionIconContentColor = MaterialTheme.colorScheme.outline,
+        containerColor = LocalBackgroundTheme.current.surface,
+        scrolledContainerColor = LocalBackgroundTheme.current.surface,
+        navigationIconContentColor = LocalBackgroundTheme.current.outline,
+        titleContentColor = LocalBackgroundTheme.current.outline,
+        actionIconContentColor = LocalBackgroundTheme.current.outline,
     ),
     title: @Composable () -> Unit,
     navIcon: @Composable () -> Unit,

@@ -37,6 +37,7 @@ import com.nkoyo.componentidentifier.ui.components.CircleIconButton
 import com.nkoyo.componentidentifier.ui.components.SecondaryButton
 import com.nkoyo.componentidentifier.ui.components.TestRecord
 import com.nkoyo.componentidentifier.ui.components.TestRecordScreen
+import com.nkoyo.componentidentifier.ui.theme.LocalBackgroundTheme
 import java.time.LocalDateTime
 
 
@@ -67,7 +68,11 @@ fun StaticBottomSheet(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp,
             focusedElevation = 2.dp,
-        )
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = LocalBackgroundTheme.current.surfaceVariant,
+            contentColor = LocalBackgroundTheme.current.onSurfaceVariant
+        ),
     ) {
         if (!minimized) {
             Spacer(modifier = modifier.height(8.dp))
@@ -81,7 +86,7 @@ fun StaticBottomSheet(
                         .width(maxWidth.times(0.22f))
                         .height(4.dp)
                         .background(
-                            color = MaterialTheme.colorScheme.outline.copy(0.6f),
+                            color = LocalBackgroundTheme.current.onSurfaceVariant.copy(0.6f),
                             shape = CircleShape
                         ),
                 )
@@ -101,6 +106,7 @@ fun StaticBottomSheet(
                         surfaceColor = Color.Transparent,
                         borderColor = Color.Transparent,
                         rotationAngle = rotationAngle,
+                        tint = LocalBackgroundTheme.current.onSurfaceVariant
                     )
                 }
 
@@ -111,14 +117,14 @@ fun StaticBottomSheet(
                         text = info.componentName,
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.outline,
+                            color = LocalBackgroundTheme.current.onSurfaceVariant,
                         )
                     )
                     Spacer(Modifier.height(12.dp))
                     Text(
                         text = info.description,
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.outline
+                            color = LocalBackgroundTheme.current.onSurfaceVariant
                         ),
                         maxLines = 5,
                         overflow = TextOverflow.Ellipsis,
@@ -132,7 +138,7 @@ fun StaticBottomSheet(
                                    openUrl(info.url)
                                    onPreviewWebInfo()
                                },
-                               contentColor = MaterialTheme.colorScheme.outline,
+                               contentColor = LocalBackgroundTheme.current.onSurfaceVariant,
                            )
                        }
                     }
@@ -150,6 +156,7 @@ fun StaticBottomSheet(
                     surfaceColor = Color.Transparent,
                     borderColor = Color.Transparent,
                     rotationAngle = rotationAngle,
+                    tint = LocalBackgroundTheme.current.onSurfaceVariant,
                 )
             }
         }

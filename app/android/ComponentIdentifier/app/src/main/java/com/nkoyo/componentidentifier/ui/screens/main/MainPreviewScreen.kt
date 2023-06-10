@@ -241,7 +241,7 @@ fun MainPreviewScreen(
         classificationState,
         bottomSheetMinimized,
     ) {
-        progressWheel = classificationState && bottomSheetMinimized
+        progressWheel = classificationState && bottomSheetMinimized && !gettingStartedState
         //control the bottom sheet data and visibility
         if (!classificationState) {
             mainViewModel.onBottomSheetMinimizedChanged(true)
