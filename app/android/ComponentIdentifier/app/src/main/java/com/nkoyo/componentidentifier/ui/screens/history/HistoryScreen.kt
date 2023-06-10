@@ -269,7 +269,6 @@ private fun HistoryScreenContent(
 
         HistoryListScreen(onClick = onClick, mainViewModel = mainViewModel)
         Row(Modifier.fillMaxSize().padding(top = 32.dp)) {
-            val configuration = LocalConfiguration.current
 
             HistoryListScreen(onClick = onClick, mainViewModel = mainViewModel)
 
