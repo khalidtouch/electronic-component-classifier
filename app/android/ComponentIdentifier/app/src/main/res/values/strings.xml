@@ -28,4 +28,11 @@
     <string name="read_more">Read more</string>
     <string name="component">Component</string>
     <string name="classifying">Classifying...</string>
+    <string name="dark_theme">Dark Theme</string>
+    <string name="cancel">Cancel</string>
+    <string name="finish">Finish</string>
+    <string name="dark_mode_settings">Dark mode settings</string>
+    <string name="dark_mode_config_light">Light</string>
+    <string name="dark_mode_config_dark">Dark</string>
+    <string name="dark_mode_config_follow_system">Follow System</string>
 </resources>

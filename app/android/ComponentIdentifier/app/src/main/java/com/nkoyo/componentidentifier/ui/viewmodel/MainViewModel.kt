@@ -24,21 +24,27 @@ import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
+import com.nkoyo.componentidentifier.UserPreferences
 import com.nkoyo.componentidentifier.data.classifier.MODEL_FILENAME_TEST
 import com.nkoyo.componentidentifier.database.HistoryDao
 import com.nkoyo.componentidentifier.database.HistoryEntity
+import com.nkoyo.componentidentifier.datastore.DarkThemeConfig
+import com.nkoyo.componentidentifier.datastore.NkPreferenceDataSource
 import com.nkoyo.componentidentifier.domain.classifier.ComponentClassifier
 import com.nkoyo.componentidentifier.domain.repository.HistoryRepository
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
+import com.nkoyo.componentidentifier.ui.components.DarkThemeConfigSettings
 import com.nkoyo.componentidentifier.ui.components.TestRecord
 import com.nkoyo.componentidentifier.ui.screens.history.HistoryItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -56,6 +62,7 @@ class MainViewModel @Inject constructor(
     private val componentClassifier: ComponentClassifier,
     private val historyRepository: HistoryRepository,
     private val savedStateHandle: SavedStateHandle,
+    private val preferences: NkPreferenceDataSource,
 ) : ViewModel() {
     val TAG = "MainViewModel"
 
@@ -83,8 +90,19 @@ class MainViewModel @Inject constructor(
     private var _classificationState = MutableStateFlow(true)
     val classificationState: StateFlow<Boolean> = _classificationState
 
-    private var _menuState = MutableStateFlow(true)
+    private var _menuState = MutableStateFlow(false)
     val menuState: StateFlow<Boolean> = _menuState
+
+    private var _darkModeDialogState = MutableStateFlow(false)
+    val darkModeDialogState: StateFlow<Boolean> = _darkModeDialogState
+
+    val darkThemeConfigSettings: StateFlow<DarkThemeConfigSettings> = preferences.userData.map {
+        DarkThemeConfigSettings(it.darkThemeConfig)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = DarkThemeConfigSettings(DarkThemeConfig.FOLLOW_SYSTEM)
+    )
 
     private val _gettingStartedState = MutableStateFlow<Boolean>(true)
     val gettingStartedState: StateFlow<Boolean> = _gettingStartedState
@@ -211,6 +229,18 @@ class MainViewModel @Inject constructor(
                 Log.e(TAG, "findByComponentId: selected historyitem is $it")
             }
         }
+    }
+
+    fun updateMenuState(state: Boolean) {
+        _menuState.value = state
+    }
+
+    fun updateDarkModeDialogState(state: Boolean) {
+        _darkModeDialogState.value = state
+    }
+
+    fun updateDarkThemeConfigState(state: DarkThemeConfig) {
+        viewModelScope.launch { preferences.updateDarkThemeConfig(state) }
     }
 
 }

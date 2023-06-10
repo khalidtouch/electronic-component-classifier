@@ -56,7 +56,6 @@ fun NavHostWrapper(
                 windowSizeClass = windowSizeClass,
                 onBackPressed = { navController.navigate(Route.MainScreen) },
                 onStartSearch = {},
-                onOptionsPressed = {},
                 onHistoryDetails = { navController.navigate(Route.HistoryDetailScreen) }
             )
         }
