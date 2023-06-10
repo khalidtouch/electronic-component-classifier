@@ -243,7 +243,8 @@ private fun CameraFlipButtonPreview(){
 @Preview
 private fun ShowRecordButtonPreview(){
     ShowRecordButton(
-        onClick = {}
+        onClick = {},
+        rotationAngle = 23f,
     )
 }
 

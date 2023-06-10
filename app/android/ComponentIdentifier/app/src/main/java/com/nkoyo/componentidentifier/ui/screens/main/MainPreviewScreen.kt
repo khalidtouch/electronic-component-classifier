@@ -69,7 +69,7 @@ import com.nkoyo.componentidentifier.domain.usecases.CameraPreviewUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageAnalysisUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
-import com.nkoyo.componentidentifier.network.linker2
+import com.nkoyo.componentidentifier.network.linker3
 import com.nkoyo.componentidentifier.ui.components.TestRecord
 import com.nkoyo.componentidentifier.ui.viewmodel.HighestProbabilityComponent
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
@@ -361,8 +361,8 @@ fun MainPreviewScreen(
                 gettingStartedState = gettingStartedState,
                 info = ComponentInfo(
                     componentName = highestProbabilityComponentBuffer.value.label.uppercase(),
-                    description = linker2[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
-                    url = linker2[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
+                    description = linker3[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
+                    url = linker3[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
                     dateTime = LocalDateTime.now(),
                 ),
             )
@@ -399,8 +399,8 @@ fun MainPreviewScreen(
                             },
                             info = ComponentInfo(
                                 componentName = highestProbabilityComponentBuffer.value.label.uppercase(),
-                                description = linker2[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
-                                url = linker2[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
+                                description = linker3[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
+                                url = linker3[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
                                 dateTime = LocalDateTime.now(),
                             ),
                             openUrl = mainViewModel::openWebUrl,
