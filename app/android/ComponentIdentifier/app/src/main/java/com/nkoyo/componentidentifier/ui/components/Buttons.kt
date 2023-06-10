@@ -92,27 +92,23 @@ fun TertiaryButton(
 fun ShowRecordButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    rotationAngle: Float,
     color: Color = MaterialTheme.colorScheme.primary,
 ){
     Surface(
         modifier = modifier
             .size(36.dp)
             .clip(CircleShape)
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .rotate(rotationAngle),
         color = color,
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data("https://example.com/image.jpg")
-                .crossfade(true)
-                .build(),
-            contentDescription = stringResource(id = R.string.flip_camera),
-            modifier = modifier
-                .size(24.dp)
-                .clip(CircleShape)
-                .padding(8.dp),
-            placeholder = painterResource(id = R.drawable.icon_item),
-            contentScale = ContentScale.Crop,
+        Icon(
+            painterResource(id = R.drawable.icon_item),
+            contentDescription = null,
+            tint = Color.Black.copy(0.7f),
+            modifier = Modifier.size(24.dp)
+                .padding(8.dp)
         )
     }
 }
@@ -162,7 +158,7 @@ fun CameraFlipButton(
     onClick: () -> Unit = {},
     rotationAngle: Float,
     color: Color = MaterialTheme.colorScheme.primary,
-    tint: Color = MaterialTheme.colorScheme.outline,
+    tint: Color = Color.Black,
 ) {
     Surface(
         modifier = modifier

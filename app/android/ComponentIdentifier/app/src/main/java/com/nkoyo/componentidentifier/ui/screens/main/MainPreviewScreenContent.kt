@@ -138,8 +138,8 @@ fun TopActionButtons(
             contentDescription = stringResource(id = R.string.close),
             onClick = onClose,
             surfaceColor = MaterialTheme.colorScheme.primary,
-            borderColor = MaterialTheme.colorScheme.outline,
-            tint = MaterialTheme.colorScheme.outline
+            borderColor = Color.Transparent,
+            tint = Color.Black
         )
 
         if (flashLightState !is ImageCaptureFlashMode.Off) {
@@ -189,7 +189,7 @@ fun BottomActionButtons(
     onToggleCamera: () -> Unit = {},
     onViewRecords: () -> Unit = {},
     rotationAngle: Float,
-    color: Color = MaterialTheme.colorScheme.outline
+    color: Color = Color.Black,
 ) {
     Surface(
         modifier = modifier,
@@ -206,6 +206,7 @@ fun BottomActionButtons(
             ShowRecordButton(
                 onClick = onViewRecords,
                 modifier = modifier,
+                rotationAngle = rotationAngle,
             )
 
             SnapshotButton(

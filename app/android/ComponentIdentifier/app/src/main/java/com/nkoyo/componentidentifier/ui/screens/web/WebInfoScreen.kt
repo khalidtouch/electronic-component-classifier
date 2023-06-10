@@ -18,12 +18,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.ui.components.CircleIconButton
 import com.nkoyo.componentidentifier.ui.theme.LocalBackgroundTheme
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 
 
+@Suppress("DEPRECATION")
 @Composable
 fun WebInfoScreen(
     onClose: () -> Unit,
@@ -41,9 +44,14 @@ fun WebInfoScreen(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
+                if(WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                    WebSettingsCompat.setForceDark(
+                        this.settings,
+                        WebSettingsCompat.FORCE_DARK_ON
+                    )
+                }
                 webViewClient = WebViewClient()
                 loadUrl(url)
-                setBackgroundColor(Color.Blue.toArgb())
             }
         },
             update = { webView ->

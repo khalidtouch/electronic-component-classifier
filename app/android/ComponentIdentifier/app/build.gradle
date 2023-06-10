@@ -104,6 +104,7 @@ dependencies {
     implementation 'androidx.paging:paging-common-ktx:3.1.1'
     implementation 'androidx.datastore:datastore:1.0.0'
     implementation 'com.google.protobuf:protobuf-kotlin-lite:3.23.2'
+    implementation 'androidx.webkit:webkit:1.7.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
