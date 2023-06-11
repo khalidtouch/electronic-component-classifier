@@ -1,0 +1,11 @@
+Battery
+Capacitor
+Cartridge Fuse
+Circuit Breaker
+Filament Bulb
+Induction Coil
+Integrated Micro-circuit
+LED
+Resistor
+Stabilizer
+Transistor
