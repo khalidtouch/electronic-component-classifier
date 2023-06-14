@@ -33,6 +33,8 @@ const val LABEL_FILENAME = "labels.txt"
 const val LABEL_FILENAME_2 = "labels2.txt"
 const val LABEL_FILENAME_4 = "labels3.txt"
 const val MODEL_FILENAME_4 = "mobilenet_v2_naive_11model.tflite"
+const val MODEL_FILENAME_5 = "mobilenet_v2_fine_tuned11.tflite"
+const val LABEL_FILENAME_5 = "labels4.txt"
 
 
 @Singleton

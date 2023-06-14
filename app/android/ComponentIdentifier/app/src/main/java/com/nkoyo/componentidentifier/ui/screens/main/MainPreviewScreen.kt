@@ -2,7 +2,6 @@ package com.nkoyo.componentidentifier.ui.screens.main
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.graphics.Paint
 import android.graphics.Point
 import android.os.Build
 import android.util.Log
@@ -10,23 +9,22 @@ import android.util.Size
 import android.view.OrientationEventListener
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
-import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,7 +39,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,7 +50,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -70,7 +66,6 @@ import com.nkoyo.componentidentifier.domain.usecases.ImageAnalysisUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
 import com.nkoyo.componentidentifier.network.linker3
-import com.nkoyo.componentidentifier.ui.components.TestRecord
 import com.nkoyo.componentidentifier.ui.viewmodel.HighestProbabilityComponent
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.delay
@@ -105,7 +100,7 @@ fun MainPreviewScreen(
         info: ComponentInfo,
         openUrl: (String) -> Unit,
     ) -> Unit = { maxWidth, maxHeight, rotationAngle, minimized, onScale, info, openUrl ->
-        StaticBottomSheet(
+        DynamicBottomSheet(
             maxWidth = maxWidth,
             maxHeight = maxHeight,
             rotationAngle = rotationAngle,
@@ -243,6 +238,7 @@ fun MainPreviewScreen(
     ) {
         progressWheel = classificationState && bottomSheetMinimized && !gettingStartedState
         //control the bottom sheet data and visibility
+        Log.e(TAG, "MainPreviewScreen: current label ${highestProbabilityComponent.label}")
         if (!classificationState) {
             mainViewModel.onBottomSheetMinimizedChanged(true)
         }
@@ -368,7 +364,7 @@ fun MainPreviewScreen(
             )
 
             if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
-                //static bottom sheet
+                //dynamic bottom sheet
                 AnimatedVisibility(
                     visible = !gettingStartedState,
                     enter = slideInVertically(
@@ -422,12 +418,12 @@ fun MainPreviewScreen(
                             strokeCap = StrokeCap.Round,
                         )
                         Spacer(Modifier.height(8.dp))
-                       Text(
-                           text = stringResource(id = R.string.classifying),
-                           style = MaterialTheme.typography.labelLarge.copy(
-                               color = MaterialTheme.colorScheme.primary
-                           )
-                       )
+                        Text(
+                            text = stringResource(id = R.string.classifying),
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
                     }
                 }
             }
