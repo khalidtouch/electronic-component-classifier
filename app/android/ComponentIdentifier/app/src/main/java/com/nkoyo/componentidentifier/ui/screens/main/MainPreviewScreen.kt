@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -65,7 +66,8 @@ import com.nkoyo.componentidentifier.domain.usecases.CameraPreviewUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageAnalysisUseCase
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureUseCase
-import com.nkoyo.componentidentifier.network.linker3
+import com.nkoyo.componentidentifier.network.linker6
+import com.nkoyo.componentidentifier.ui.theme.DeviceSizePreviews
 import com.nkoyo.componentidentifier.ui.viewmodel.HighestProbabilityComponent
 import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.delay
@@ -246,7 +248,9 @@ fun MainPreviewScreen(
         Log.e(TAG, "MainPreviewScreen: bottom sheet effect called")
         if (gettingStartedState) return@LaunchedEffect
         if (highestProbabilityComponent == HighestProbabilityComponent.Default) return@LaunchedEffect
+        val initialResult = highestProbabilityComponent.label
         delay(3_000)
+        if(highestProbabilityComponent.label != initialResult) return@LaunchedEffect
         if (classificationState && bottomSheetMinimized) {
             highestProbabilityComponentBuffer.value = highestProbabilityComponent
             mainViewModel.onBottomSheetMinimizedChanged(false)
@@ -357,8 +361,8 @@ fun MainPreviewScreen(
                 gettingStartedState = gettingStartedState,
                 info = ComponentInfo(
                     componentName = highestProbabilityComponentBuffer.value.label.uppercase(),
-                    description = linker3[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
-                    url = linker3[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
+                    description = linker6[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
+                    url = linker6[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
                     dateTime = LocalDateTime.now(),
                 ),
             )
@@ -395,8 +399,8 @@ fun MainPreviewScreen(
                             },
                             info = ComponentInfo(
                                 componentName = highestProbabilityComponentBuffer.value.label.uppercase(),
-                                description = linker3[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
-                                url = linker3[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
+                                description = linker6[highestProbabilityComponentBuffer.value.label]?.second.orEmpty(),
+                                url = linker6[highestProbabilityComponentBuffer.value.label]?.first.orEmpty(),
                                 dateTime = LocalDateTime.now(),
                             ),
                             openUrl = mainViewModel::openWebUrl,

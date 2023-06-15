@@ -268,7 +268,6 @@ fun HistoryScreen(
     }
 }
 
-
 @Composable
 private fun HistoryScreenContent(
     modifier: Modifier = Modifier,
