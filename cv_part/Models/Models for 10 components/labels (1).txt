@@ -1,0 +1,10 @@
+Battery
+Capacitor
+Cartridge_Fuse
+Circuit_Breaker
+Filament_Bulb
+Integrated_Circuit
+LED
+Pulse_Generator
+Resistor
+Transistor
