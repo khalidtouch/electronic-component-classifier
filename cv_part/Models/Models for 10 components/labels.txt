@@ -1,10 +1,10 @@
-Batteries
+Battery
 Capacitor
-Cartridge_fuse
-Circuit_breaker
+Cartridge_Fuse
+Circuit_Breaker
 Filament_Bulb
-Inductor
+Integrated_Circuit
 LED
+Pulse_Generator
 Resistor
-Transformer
 Transistor
