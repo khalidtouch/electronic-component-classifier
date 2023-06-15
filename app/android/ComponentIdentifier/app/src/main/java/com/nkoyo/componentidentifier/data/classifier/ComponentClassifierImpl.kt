@@ -37,7 +37,7 @@ const val LABEL_FILENAME_4 = "labels3.txt"
 const val MODEL_FILENAME_4 = "mobilenet_v2_naive_11model.tflite"
 const val MODEL_FILENAME_5 = "mobilenet_v2_fine_tuned11.tflite"
 const val LABEL_FILENAME_5 = "labels4.txt"
-const val MODEL_FILENAME_6 = "mobilenet_v2_naive_10model6.tflite"
+const val MODEL_FILENAME_6 = "mobilenet_v2_fine_tuned10_6.tflite"
 const val LABEL_FILENAME_6 = "labels6.txt"
 
 
