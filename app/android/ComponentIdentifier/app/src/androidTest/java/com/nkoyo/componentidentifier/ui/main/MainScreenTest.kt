@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nkoyo.componentidentifier.R
+import com.nkoyo.componentidentifier.domain.extensions.takeSnapshot
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.ui.fakes.produceResult
 import com.nkoyo.componentidentifier.ui.navigation.Route.MainScreen
@@ -37,6 +39,7 @@ import com.nkoyo.componentidentifier.ui.screens.main.MainScreen
 import com.nkoyo.componentidentifier.ui.viewmodel.EMPTY_FILE
 import com.nkoyo.componentidentifier.ui.viewmodel.HighestProbabilityComponent
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.Executors
@@ -766,10 +769,10 @@ class MainScreenTest {
                 classificationState,
                 bottomSheetMinimized
             ) {
-                if(!classificationState) bottomSheetMinimized = true
-                if(gettingStartedState) return@LaunchedEffect
+                if (!classificationState) bottomSheetMinimized = true
+                if (gettingStartedState) return@LaunchedEffect
                 delay(3_000)
-                if(classificationState && bottomSheetMinimized) {
+                if (classificationState && bottomSheetMinimized) {
                     bottomSheetMinimized = false
                 }
             }
@@ -783,7 +786,8 @@ class MainScreenTest {
                     clearSavedUri = {},
                     windowSizeClass = calculateWindowSizeClass(activity = composeTestRule.activity),
                     flashLightState = flashlightState,
-                    onTakeSnapshot = {},
+                    onTakeSnapshot = {
+                    },
                     onToggleFlashLight = {
                         flashlightState = when (flashlightState) {
                             ImageCaptureFlashMode.Off -> {
