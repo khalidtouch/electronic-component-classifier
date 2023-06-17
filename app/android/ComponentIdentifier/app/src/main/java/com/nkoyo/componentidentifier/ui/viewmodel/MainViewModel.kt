@@ -3,15 +3,13 @@ package com.nkoyo.componentidentifier.ui.viewmodel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
-import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
-import androidx.camera.view.PreviewView
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import com.nkoyo.componentidentifier.database.HistoryDao
 import com.nkoyo.componentidentifier.database.HistoryEntity
 import com.nkoyo.componentidentifier.datastore.DarkThemeConfig
 import com.nkoyo.componentidentifier.datastore.NkPreferenceDataSource
@@ -20,7 +18,6 @@ import com.nkoyo.componentidentifier.domain.repository.HistoryRepository
 import com.nkoyo.componentidentifier.domain.usecases.ImageCaptureFlashMode
 import com.nkoyo.componentidentifier.ui.components.DarkThemeConfigSettings
 import com.nkoyo.componentidentifier.ui.components.TestRecord
-import com.nkoyo.componentidentifier.ui.screens.history.HistoryItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -30,10 +27,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -41,6 +36,7 @@ import javax.inject.Inject
 
 const val KEY_SELECTED_HISTORY_ID = "selected_history_id"
 const val KEY_SELECTED_URL = "selected_url"
+const val EMPTY_FILE = "file://dev/null"
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -82,6 +78,9 @@ class MainViewModel @Inject constructor(
     private var _darkModeDialogState = MutableStateFlow(false)
     val darkModeDialogState: StateFlow<Boolean> = _darkModeDialogState
 
+    private val _savedImageUri = MutableStateFlow<Uri>(Uri.parse(EMPTY_FILE))
+    val savedImageUri: StateFlow<Uri> = _savedImageUri
+
     val darkThemeConfigSettings: StateFlow<DarkThemeConfigSettings> = preferences.userData.map {
         DarkThemeConfigSettings(it.darkThemeConfig)
     }.stateIn(
@@ -94,10 +93,28 @@ class MainViewModel @Inject constructor(
     val gettingStartedState: StateFlow<Boolean> = _gettingStartedState
 
 
-    private val _currentHighestProbabilityComponent =
+    val progressWheelState: StateFlow<Boolean> = combine(
+        _bottomSheetMinimized,
+        _gettingStartedState,
+        _classificationState
+    ) { bottomSheet, gettingStarted, classification ->
+        classification && bottomSheet && !gettingStarted
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = false,
+    )
+
+
+    private val _result =
         MutableStateFlow<HighestProbabilityComponent>(HighestProbabilityComponent.Default)
-    val currentHighestProbabilityComponent: StateFlow<HighestProbabilityComponent> =
-        _currentHighestProbabilityComponent
+    val result: StateFlow<HighestProbabilityComponent> =
+        _result
+
+    private val _resultBuffer =
+        MutableStateFlow<HighestProbabilityComponent>(HighestProbabilityComponent.Default)
+    val resultBuffer: StateFlow<HighestProbabilityComponent> =
+        _result
 
     val historyAsPaged: Flow<PagingData<HistoryEntity>> =
         historyRepository.showHistoryAsPaged(20)
@@ -113,6 +130,14 @@ class MainViewModel @Inject constructor(
         key = KEY_SELECTED_URL, initialValue = ""
     )
 
+    fun updateSavedUri(uri: Uri) {
+        _savedImageUri.value = uri
+    }
+
+    fun clearSavedUri() {
+        _savedImageUri.value = Uri.parse(EMPTY_FILE)
+    }
+
     private val _highestProbabilityComponentLabel = MutableStateFlow<String>("")
     val highestProbabilityComponentLabel: StateFlow<String> = _highestProbabilityComponentLabel
 
@@ -124,8 +149,8 @@ class MainViewModel @Inject constructor(
         savedStateHandle[KEY_SELECTED_URL] = url
     }
 
-    fun updateHighestProbabilityComponent(component: HighestProbabilityComponent) {
-        _currentHighestProbabilityComponent.value = component
+    fun updateResult(component: HighestProbabilityComponent) {
+        _result.value = component
     }
 
     fun onBottomSheetMinimizedChanged(minimized: Boolean) {
@@ -151,20 +176,40 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun updateHighestProbabilityLabel(label: String) {
+    fun updateResultLabel(label: String) {
         _highestProbabilityComponentLabel.value = label
     }
 
+    fun onBufferResult(result: HighestProbabilityComponent) {
+        _resultBuffer.value = result
+    }
+
     fun onFlashLightStateChanged(state: ImageCaptureFlashMode) {
-        _flashLightState.value = state
+        when (state) {
+            //  circular control
+            is ImageCaptureFlashMode.Auto -> {
+                _flashLightState.value = ImageCaptureFlashMode.On
+            }
+
+            is ImageCaptureFlashMode.On -> {
+                _flashLightState.value = ImageCaptureFlashMode.Off
+            }
+
+            is ImageCaptureFlashMode.Off -> {
+                _flashLightState.value = ImageCaptureFlashMode.Auto
+            }
+        }
     }
 
     fun classify(bitmap: Bitmap): HashMap<String, String> {
         return componentClassifier.classify(bitmap)
     }
 
-    fun classifyAndProduceHighestProbabilityLabel(bitmap: Bitmap): Pair<String, Float> {
-        return componentClassifier.classifyAndProduceHighestProbabilityLabel(bitmap)
+    fun classifyAndProduceHighestProbabilityLabel(bitmap: Bitmap): HighestProbabilityComponent {
+        val (label, probability) = componentClassifier.classifyAndProduceHighestProbabilityLabel(
+            bitmap
+        )
+        return HighestProbabilityComponent(label, probability)
     }
 
     fun loadLabelData(filename: String): ArrayList<String> {

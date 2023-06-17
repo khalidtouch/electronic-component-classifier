@@ -41,7 +41,6 @@ fun NavHostWrapper(
     ) {
         composable(Route.MainScreen) {
             MainScreen(
-                navController = navController,
                 windowSizeClass = windowSizeClass,
                 onAbortApplication = onAbortApplication,
                 onViewRecords = { navController.navigate(Route.HistoryScreen) },

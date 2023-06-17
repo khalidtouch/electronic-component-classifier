@@ -25,29 +25,27 @@ import coil.request.ImageRequest
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.ui.components.CircleIconButton
 
-
 @Composable
-fun PhotoCaptureScreen (
-    modifier: Modifier = Modifier,
-    rotationAngle: Float,
+fun PhotoCaptureScreen(
+    imageUri: Uri,
     onRemove: () -> Unit,
-    imageUri: MutableState<Uri> = remember { mutableStateOf(Uri.parse("file://dev/null"))},
-){
-    Surface(modifier = Modifier){
+    rotationAngle: Float,
+) {
+    Surface(modifier = Modifier) {
         BoxWithConstraints(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
         ) {
             AsyncImage(
                 modifier = Modifier.fillMaxSize(),
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUri.value)
+                    .data(imageUri)
                     .build(),
                 contentDescription = stringResource(id = R.string.saved_photo),
             )
 
             Box(
                 modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter
-            ){
+            ) {
                 RemoveSavedPhotoButton(
                     onRemove = onRemove,
                     rotationAngle = rotationAngle,
@@ -79,7 +77,7 @@ fun RemoveSavedPhotoButton(
             modifier = modifier,
             rotationAngle = rotationAngle,
             icon = R.drawable.icon_close,
-            contentDescription = stringResource(id = R.string.close),
+            contentDesc = stringResource(id = R.string.close_capture_button),
             onClick = onRemove,
             surfaceColor = Color.Transparent,
             borderColor = MaterialTheme.colorScheme.outline,

@@ -1,11 +1,8 @@
 package com.nkoyo.componentidentifier.ui.screens.main
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -44,16 +41,21 @@ import com.nkoyo.componentidentifier.ui.components.SnapshotButton
 fun MainPreviewScreenContent(
     modifier: Modifier = Modifier,
     rotationAngle: Float,
+    maxHeight: Dp,
+    maxWidth: Dp,
     gettingStartedState: Boolean,
-    isBottomSheetMinimized: Boolean,
     windowSizeClass: WindowSizeClass,
-    onClose: () -> Unit = {},
-    onToggleFlashLight: () -> Unit = {},
-    onTakeSnapshot: () -> Unit = {},
-    onToggleCamera: () -> Unit = {},
-    onViewRecords: () -> Unit = {},
+    onAbort: () -> Unit,
+    onToggleFlashLight: () -> Unit,
+    onTakeSnapshot: () -> Unit,
+    onToggleCamera: () -> Unit,
+    onViewRecords: () -> Unit,
     flashLightState: ImageCaptureFlashMode,
-    bottomSheet: @Composable () -> Unit,
+    openUrl: (String) -> Unit,
+    bottomSheetMinimized: Boolean,
+    info: ComponentInfo,
+    onPreviewWebInfo: () -> Unit,
+    onScale: () -> Unit,
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -69,7 +71,7 @@ fun MainPreviewScreenContent(
                         modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter
                     ) {
                         TopActionButtons(
-                            onClose = onClose,
+                            onClose = onAbort,
                             onToggleFlashLight = onToggleFlashLight,
                             flashLightState = flashLightState,
                             rotationAngle = rotationAngle,
@@ -106,7 +108,18 @@ fun MainPreviewScreenContent(
                             .width(parentWidth.times(0.3f))
                             .fillMaxHeight()
                     ) {
-                        bottomSheet()
+                        DynamicBottomSheet(
+                            maxWidth = maxWidth,
+                            maxHeight = maxHeight,
+                            onPreviewWebInfo = onPreviewWebInfo,
+                            openUrl = openUrl,
+                            windowSizeClass = windowSizeClass,
+                            rotationAngle = rotationAngle,
+                            minimized = bottomSheetMinimized,
+                            onScale = onScale,
+                            info = info,
+                            contentDesc = stringResource(id = R.string.large_and_medium_bottom_sheet)
+                        )
                     }
                 }
             }
@@ -135,7 +148,7 @@ fun TopActionButtons(
             modifier = modifier,
             rotationAngle = rotationAngle,
             icon = R.drawable.icon_close,
-            contentDescription = stringResource(id = R.string.close),
+            contentDesc = stringResource(id = R.string.close_button),
             onClick = onClose,
             surfaceColor = MaterialTheme.colorScheme.primary,
             borderColor = Color.Transparent,
@@ -147,7 +160,7 @@ fun TopActionButtons(
                 modifier = modifier,
                 rotationAngle = rotationAngle,
                 icon = R.drawable.icon_lightning,
-                contentDescription = stringResource(id = R.string.toggle_flashlight),
+                contentDesc = stringResource(id = R.string.flashlight_button_on),
                 onClick = onToggleFlashLight,
                 surfaceColor = Color.Transparent,
                 borderColor = MaterialTheme.colorScheme.primary,
@@ -160,7 +173,7 @@ fun TopActionButtons(
                     modifier = modifier,
                     rotationAngle = rotationAngle,
                     icon = R.drawable.icon_lightning,
-                    contentDescription = stringResource(id = R.string.toggle_flashlight),
+                    contentDesc = stringResource(id = R.string.flashlight_button_off),
                     onClick = onToggleFlashLight,
                     surfaceColor = Color.Transparent,
                     borderColor = MaterialTheme.colorScheme.primary,
@@ -207,18 +220,21 @@ fun BottomActionButtons(
                 onClick = onViewRecords,
                 modifier = modifier,
                 rotationAngle = rotationAngle,
+                contentDesc = stringResource(id = R.string.show_record_button)
             )
 
             SnapshotButton(
                 onClick = onTakeSnapshot,
                 rotationAngle = rotationAngle,
                 modifier = modifier,
+                contentDesc = stringResource(id = R.string.snapshot_button)
             )
 
             CameraFlipButton(
                 onClick = onToggleCamera,
                 rotationAngle = rotationAngle,
                 modifier = modifier,
+                contentDesc = stringResource(id = R.string.camera_flip_button)
             )
         }
     }

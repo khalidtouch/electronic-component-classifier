@@ -23,6 +23,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,18 +42,21 @@ fun SecondaryButton(
     label: String,
     style: TextStyle = MaterialTheme.typography.labelLarge,
     onClick: () -> Unit = {},
+    contentDesc: String,
     contentColor: Color = LocalBackgroundTheme.current.outline,
     containerColor: Color = LocalBackgroundTheme.current.outline,
-){
+) {
     OutlinedButton(
-        modifier = modifier.clip(CircleShape),
+        modifier = modifier
+            .clip(CircleShape)
+            .semantics { contentDescription = contentDesc },
         onClick = onClick,
         shape = CircleShape,
         border = BorderStroke(
             width = 1.dp,
             color = containerColor,
         )
-    ){
+    ) {
         Text(
             text = label,
             style = style,
@@ -67,17 +72,20 @@ fun TertiaryButton(
     label: String,
     onClick: () -> Unit = {},
     style: TextStyle = MaterialTheme.typography.labelLarge,
-    contentColor: Color = MaterialTheme.colorScheme.outline
-){
+    contentColor: Color = MaterialTheme.colorScheme.outline,
+    contentDesc: String,
+) {
     OutlinedButton(
-        modifier = modifier.clip(CircleShape),
+        modifier = modifier
+            .clip(CircleShape)
+            .semantics { contentDescription = contentDesc },
         onClick = onClick,
         shape = CircleShape,
         border = BorderStroke(
             width = 1.dp,
             color = Color.Transparent,
         )
-    ){
+    ) {
         Text(
             text = label,
             style = style,
@@ -94,20 +102,23 @@ fun ShowRecordButton(
     onClick: () -> Unit,
     rotationAngle: Float,
     color: Color = MaterialTheme.colorScheme.primary,
-){
+    contentDesc: String,
+) {
     Surface(
         modifier = modifier
             .size(36.dp)
             .clip(CircleShape)
             .clickable { onClick() }
-            .rotate(rotationAngle),
+            .rotate(rotationAngle)
+            .semantics { contentDescription = contentDesc },
         color = color,
     ) {
         Icon(
             painterResource(id = R.drawable.icon_item),
             contentDescription = null,
             tint = Color.Black.copy(0.7f),
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier
+                .size(24.dp)
                 .padding(8.dp)
         )
     }
@@ -122,31 +133,32 @@ fun CircleIconButton(
     surfaceColor: Color = MaterialTheme.colorScheme.primary,
     borderColor: Color = MaterialTheme.colorScheme.outline,
     tint: Color = MaterialTheme.colorScheme.outline,
-    contentDescription: String,
     padding: Dp = 8.dp,
     rotationAngle: Float,
     selected: Boolean = true,
+    contentDesc: String
 ) {
     Surface(
         modifier = modifier
             .size(32.dp)
             .clip(CircleShape)
             .clickable { onClick() }
-            .rotate(rotationAngle),
+            .rotate(rotationAngle)
+            .semantics { contentDescription = contentDesc },
         color = surfaceColor,
         shape = CircleShape,
         border = BorderStroke(
-            1.5.dp, color =  if(selected) borderColor else borderColor.copy(0.5f),
+            1.5.dp, color = if (selected) borderColor else borderColor.copy(0.5f),
         )
     ) {
         Icon(
             painter = painterResource(id = icon),
-            contentDescription = contentDescription,
+            contentDescription = null,
             modifier = modifier
                 .size(iconSize)
                 .clip(CircleShape)
                 .padding(padding),
-            tint = if(selected) tint else tint.copy(0.5f),
+            tint = if (selected) tint else tint.copy(0.5f),
         )
     }
 }
@@ -159,13 +171,15 @@ fun CameraFlipButton(
     rotationAngle: Float,
     color: Color = MaterialTheme.colorScheme.primary,
     tint: Color = Color.Black,
+    contentDesc: String,
 ) {
     Surface(
         modifier = modifier
             .size(32.dp)
             .clip(CircleShape)
             .clickable { onClick() }
-            .rotate(rotationAngle),
+            .rotate(rotationAngle)
+            .semantics { contentDescription = contentDesc },
         shape = CircleShape,
         color = color,
     ) {
@@ -188,6 +202,7 @@ fun SnapshotButton(
     onClick: () -> Unit = {},
     color: Color = MaterialTheme.colorScheme.primary,
     tint: Color = MaterialTheme.colorScheme.outline,
+    contentDesc: String,
 ) {
     Surface(
         modifier = Modifier
@@ -196,7 +211,7 @@ fun SnapshotButton(
             .clip(CircleShape)
             .clickable { onClick() }
             .rotate(rotationAngle)
-        , shape = CircleShape,
+            .semantics { contentDescription = contentDesc }, shape = CircleShape,
         color = Color.White,
         border = BorderStroke(
             width = 1.dp,
@@ -219,40 +234,43 @@ fun SnapshotButton(
 }
 
 
-
 @Composable
 @Preview
-private fun SnapshotButtonPreview(){
+private fun SnapshotButtonPreview() {
     SnapshotButton(
         rotationAngle = 23f,
+        contentDesc = ""
     )
 }
 
 
 @Composable
 @Preview
-private fun CameraFlipButtonPreview(){
+private fun CameraFlipButtonPreview() {
     CameraFlipButton(
         onClick = {},
         rotationAngle = 23f,
+        contentDesc = ""
     )
 }
 
 
 @Composable
 @Preview
-private fun ShowRecordButtonPreview(){
+private fun ShowRecordButtonPreview() {
     ShowRecordButton(
         onClick = {},
         rotationAngle = 23f,
+        contentDesc = ""
     )
 }
 
 @Composable
 @Preview
-private fun SecondaryButtonPreview(){
+private fun SecondaryButtonPreview() {
     SecondaryButton(
         label = "Click me!",
-        onClick = {}
+        onClick = {},
+        contentDesc = ""
     )
 }

@@ -24,6 +24,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +49,7 @@ fun GettingStartedContent(
     windowSizeClass: WindowSizeClass,
     fullWidth: Dp,
     onAbort: () -> Unit = {},
+    contentDesc: String,
 ) {
     val valueMessage = buildAnnotatedString {
         append(
@@ -57,7 +61,27 @@ fun GettingStartedContent(
         append(". This uses machine learning to produce component information with a high accuracy.")
     }
 
+    GettingStartedContent(
+        modifier = modifier,
+        onGettingApplicationStarted = onGettingApplicationStarted,
+        windowSizeClass = windowSizeClass,
+        fullWidth = fullWidth,
+        onAbort = onAbort,
+        valueMessage = valueMessage,
+        contentDesc = contentDesc,
+    )
+}
 
+@Composable
+private fun GettingStartedContent(
+    modifier: Modifier = Modifier,
+    onGettingApplicationStarted: () -> Unit,
+    windowSizeClass: WindowSizeClass,
+    fullWidth: Dp,
+    onAbort: () -> Unit,
+    valueMessage: AnnotatedString,
+    contentDesc: String,
+) {
     Surface(modifier = modifier) {
         Box(
             modifier = modifier.fillMaxSize(),
@@ -88,7 +112,8 @@ fun GettingStartedContent(
                         bottom = 16.dp,
                         start = 8.dp,
                         end = 8.dp
-                    ),
+                    )
+                    .semantics { contentDescription = contentDesc },
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 2.dp,
                     pressedElevation = 0.dp,
@@ -151,6 +176,7 @@ fun GettingStartedContent(
                                 contentColor =LocalBackgroundTheme.current.onSurfaceVariant,
                                 label = stringResource(id = R.string.abort),
                                 onClick = onAbort,
+                                contentDesc = stringResource(id = R.string.abort_button)
                             )
 
                             SecondaryButton(
@@ -158,6 +184,7 @@ fun GettingStartedContent(
                                 contentColor = LocalBackgroundTheme.current.onSurfaceVariant,
                                 label = stringResource(id = R.string.get_started),
                                 onClick = onGettingApplicationStarted,
+                                contentDesc = stringResource(id = R.string.get_started_button),
                             )
                         }
                     }
@@ -165,5 +192,4 @@ fun GettingStartedContent(
             }
         }
     }
-
 }

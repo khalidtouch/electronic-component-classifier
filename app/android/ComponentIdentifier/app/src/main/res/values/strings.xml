@@ -35,4 +35,23 @@
     <string name="dark_mode_config_light">Light</string>
     <string name="dark_mode_config_dark">Dark</string>
     <string name="dark_mode_config_follow_system">Follow System</string>
+    <string name="dynamic_bottom_sheet">DynamicBottomSheet</string>
+    <string name="minimize_button">button:minimize</string>
+    <string name="maximize_button">button:maximize</string>
+    <string name="read_more_button">button:read_more</string>
+    <string name="bottom_sheet_compact">bottom_sheet:compact</string>
+    <string name="circular_progress_indicator">circular_progress_indicator</string>
+    <string name="large_and_medium_bottom_sheet">bottom_sheet:large_and_medium</string>
+    <string name="close_button">button:close</string>
+    <string name="flashlight_button">button:flashlight</string>
+    <string name="flashlight_button_off">button:flashlight_off</string>
+    <string name="flashlight_button_on">button:flashlight_on</string>
+    <string name="get_started_button">button:get_started</string>
+    <string name="close_capture_button">button:close_capture</string>
+    <string name="close_web_view_button">button:close_webview</string>
+    <string name="getting_started_dialog">dialog:getting_started</string>
+    <string name="abort_button">button:abort</string>
+    <string name="show_record_button">button:show_record</string>
+    <string name="snapshot_button">button:snapshot</string>
+    <string name="camera_flip_button">button:camera_flip</string>
 </resources>
