@@ -63,9 +63,6 @@ class MainViewModel @Inject constructor(
     val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     val flashLightExecutor: ExecutorService = Executors.newSingleThreadExecutor()
 
-    private var _testRecords = MutableStateFlow(mutableListOf<TestRecord>())
-    val testRecords: StateFlow<List<TestRecord>> = _testRecords
-
     private var _bottomSheetMinimized = MutableStateFlow(true)
     val bottomSheetMinimized: StateFlow<Boolean> = _bottomSheetMinimized
 
@@ -114,7 +111,7 @@ class MainViewModel @Inject constructor(
     private val _resultBuffer =
         MutableStateFlow<HighestProbabilityComponent>(HighestProbabilityComponent.Default)
     val resultBuffer: StateFlow<HighestProbabilityComponent> =
-        _result
+        _resultBuffer
 
     val historyAsPaged: Flow<PagingData<HistoryEntity>> =
         historyRepository.showHistoryAsPaged(20)
@@ -155,11 +152,6 @@ class MainViewModel @Inject constructor(
 
     fun onBottomSheetMinimizedChanged(minimized: Boolean) {
         _bottomSheetMinimized.value = minimized
-    }
-
-    fun onTestRecordsChanged(records: List<TestRecord>) {
-        _testRecords.value = records.toMutableList()
-        Log.e(TAG, "onTestRecordsChanged: testRecords size is ${_testRecords.value.size}")
     }
 
     fun updateClassificationState(state: Boolean) {

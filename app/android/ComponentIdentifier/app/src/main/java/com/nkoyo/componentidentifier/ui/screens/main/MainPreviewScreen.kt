@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Build
+import android.util.Log
 import android.view.OrientationEventListener
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
@@ -187,6 +188,7 @@ private fun MainPreviewScreen(
 ) {
 
     val context = LocalContext.current
+    val TAG = "MainPreview"
     var rotationAngle by remember { mutableStateOf(0f) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -286,6 +288,7 @@ private fun MainPreviewScreen(
         if (classificationState && bottomSheetMinimized) {
             onBufferResult(result)
             expandBottomSheet()
+            Log.e(TAG, "MainPreviewScreen: onBufferResult is called")
         }
     }
 

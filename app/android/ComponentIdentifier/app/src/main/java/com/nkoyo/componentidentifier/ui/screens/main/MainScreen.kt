@@ -128,7 +128,7 @@ fun MainScreen(
         classificationState = classificationState,
         minimizeBottomSheet = { mainViewModel.onBottomSheetMinimizedChanged(true) },
         expandBottomSheet = { mainViewModel.onBottomSheetMinimizedChanged(false) },
-        onScale = {mainViewModel.onBottomSheetMinimizedChanged(!bottomSheetMinimized)},
+        onScale = { mainViewModel.updateClassificationState(!classificationState) },
         openUrl = mainViewModel::openWebUrl,
         result = result,
     )

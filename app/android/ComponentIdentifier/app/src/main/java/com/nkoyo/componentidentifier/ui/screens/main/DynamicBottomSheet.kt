@@ -133,8 +133,8 @@ private fun DynamicBottomSheet(
                         .padding(horizontal = 16.dp), contentAlignment = Alignment.CenterEnd
                 ) {
                     CircleIconButton(
-                        icon = if (bottomSheetMinimized) R.drawable.icon_maximize else R.drawable.icon_minimize,
-                        contentDesc = stringResource(id = R.string.maximize_button),
+                        icon = R.drawable.icon_minimize,
+                        contentDesc = stringResource(id = R.string.minimize_button),
                         onClick = onScale,
                         surfaceColor = Color.Transparent,
                         borderColor = Color.Transparent,
@@ -185,7 +185,7 @@ private fun DynamicBottomSheet(
             ) {
                 CircleIconButton(
                     icon = R.drawable.icon_maximize,
-                    contentDesc = stringResource(id = R.string.minimize_button),
+                    contentDesc = stringResource(id = R.string.maximize_button),
                     onClick = onScale,
                     surfaceColor = Color.Transparent,
                     borderColor = Color.Transparent,
