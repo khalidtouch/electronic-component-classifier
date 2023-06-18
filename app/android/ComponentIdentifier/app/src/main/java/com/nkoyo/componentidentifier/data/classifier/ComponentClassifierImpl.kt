@@ -7,7 +7,9 @@ import android.os.SystemClock
 import com.nkoyo.componentidentifier.R
 import com.nkoyo.componentidentifier.domain.classifier.ComponentClassifier
 import com.nkoyo.componentidentifier.domain.extensions.appendPercent
+import com.nkoyo.componentidentifier.ui.viewmodel.HighestProbabilityComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
@@ -33,6 +35,10 @@ const val LABEL_FILENAME = "labels.txt"
 const val LABEL_FILENAME_2 = "labels2.txt"
 const val LABEL_FILENAME_4 = "labels3.txt"
 const val MODEL_FILENAME_4 = "mobilenet_v2_naive_11model.tflite"
+const val MODEL_FILENAME_5 = "mobilenet_v2_fine_tuned11.tflite"
+const val LABEL_FILENAME_5 = "labels4.txt"
+const val MODEL_FILENAME_6 = "mobilenet_v2_fine_tuned10_6.tflite"
+const val LABEL_FILENAME_6 = "labels6.txt"
 
 
 @Singleton
@@ -51,8 +57,8 @@ class ComponentClassifierImpl @Inject constructor(
     override fun initialize() {
         try {
             val assetManager = context.assets
-            val model = loadModelFile(assetManager, MODEL_FILENAME_4) ?: return
-            labels = loadLabelData(context, LABEL_FILENAME_4)
+            val model = loadModelFile(assetManager, MODEL_FILENAME_6) ?: return
+            labels = loadLabelData(context, LABEL_FILENAME_6)
             val compatibilityList = CompatibilityList()
             val options = Interpreter.Options().apply {
                 if (compatibilityList.isDelegateSupportedOnThisDevice) {

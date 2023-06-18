@@ -2,6 +2,7 @@ package com.nkoyo.componentidentifier.domain.classifier
 
 import android.content.Context
 import android.graphics.Bitmap
+import com.nkoyo.componentidentifier.ui.viewmodel.HighestProbabilityComponent
 
 interface ComponentClassifier {
     fun initialize()

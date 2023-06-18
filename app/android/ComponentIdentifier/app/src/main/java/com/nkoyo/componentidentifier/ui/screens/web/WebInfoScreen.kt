@@ -66,7 +66,7 @@ fun WebInfoScreen(
                 .background(color = Color.Transparent), contentAlignment = Alignment.TopEnd) {
             CircleIconButton(
                 icon = R.drawable.icon_close,
-                contentDescription = stringResource(id = R.string.close),
+                contentDesc = stringResource(id = R.string.close_web_view_button),
                 rotationAngle = 0f,
                 onClick = onClose,
             )
