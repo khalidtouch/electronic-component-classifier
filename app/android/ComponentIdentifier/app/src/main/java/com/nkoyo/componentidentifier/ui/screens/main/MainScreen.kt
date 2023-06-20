@@ -134,7 +134,7 @@ fun MainScreen(
         onScale = {
             mainViewModel.updateClassificationState(!classificationState)
             if (shouldShowTapIndicator) mainViewModel.clearTapIndicator()
-            if(shouldShowMinimizeIndicator) mainViewModel.clearMinimizeIndicator()
+            if(shouldShowMinimizeIndicator) mainViewModel.completeFirstClassification()
         },
         openUrl = mainViewModel::openWebUrl,
         result = result,

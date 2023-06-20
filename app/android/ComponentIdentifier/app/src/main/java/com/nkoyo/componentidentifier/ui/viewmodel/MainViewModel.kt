@@ -37,7 +37,6 @@ import javax.inject.Inject
 
 const val KEY_SELECTED_HISTORY_ID = "selected_history_id"
 const val KEY_TAP_INDICATOR = "key_tap_indicator"
-const val KEY_MINIMIZE_INDICATOR = "key_minimize_indicator"
 const val KEY_SELECTED_URL = "selected_url"
 const val EMPTY_FILE = "file://dev/null"
 
@@ -130,8 +129,19 @@ class MainViewModel @Inject constructor(
         key = KEY_TAP_INDICATOR, initialValue = true
     )
 
-    val minimizeIndicatorState: StateFlow<Boolean> = savedStateHandle.getStateFlow(
-        key = KEY_MINIMIZE_INDICATOR, initialValue = false
+    private val _firstClassificationState = MutableStateFlow<Boolean>(true)
+    val firstClassificationState: StateFlow<Boolean> = _firstClassificationState
+
+    val minimizeIndicatorState: StateFlow<Boolean> = combine(
+        _firstClassificationState,
+        tapIndicatorState,
+        _bottomSheetMinimized
+    ) { first, tap, sheetMinimized ->
+        first && !tap && !sheetMinimized
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = false,
     )
 
     private val _selectedHistoryEntity = MutableStateFlow<HistoryEntity?>(null)
@@ -145,20 +155,16 @@ class MainViewModel @Inject constructor(
         _savedImageUri.value = uri
     }
 
+    fun completeFirstClassification() {
+        _firstClassificationState.value = false
+    }
+
     fun updateBottomSheetHeight(height: Int) {
         _bottomSheetHeight.value = height
     }
 
     fun clearTapIndicator() {
-        viewModelScope.launch {
-            savedStateHandle[KEY_TAP_INDICATOR] = false
-            delay(7_000)
-            savedStateHandle[KEY_MINIMIZE_INDICATOR] = true
-        }
-    }
-
-    fun clearMinimizeIndicator() {
-        savedStateHandle[KEY_MINIMIZE_INDICATOR] = false
+        savedStateHandle[KEY_TAP_INDICATOR] = false
     }
 
     fun clearSavedUri() {
