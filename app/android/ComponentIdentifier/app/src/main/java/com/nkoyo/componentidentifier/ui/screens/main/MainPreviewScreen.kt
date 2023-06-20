@@ -13,6 +13,10 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -22,9 +26,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,10 +48,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -113,6 +122,10 @@ fun MainPreviewScreen(
     cameraPermissionState: PermissionState = rememberPermissionState(
         Manifest.permission.CAMERA
     ),
+    shouldShowTapIndicator: Boolean,
+    updateBottomSheetHeight: (Int) -> Unit,
+    bottomSheetHeight: Int,
+    shouldShowMinimizeIndicator: Boolean,
 ) {
     val TAG = "MainPreviewScreen"
     val configuration = LocalConfiguration.current
@@ -150,6 +163,10 @@ fun MainPreviewScreen(
         updateResult = updateResult,
         result = result,
         onBufferResult = onBufferResult,
+        shouldShowTapIndicator = shouldShowTapIndicator,
+        updateBottomSheetHeight = updateBottomSheetHeight,
+        bottomSheetHeight = bottomSheetHeight,
+        shouldShowMinimizeIndicator = shouldShowMinimizeIndicator,
     )
 }
 
@@ -185,6 +202,10 @@ private fun MainPreviewScreen(
     minimizeBottomSheet: () -> Unit,
     expandBottomSheet: () -> Unit,
     onBufferResult: (HighestProbabilityComponent) -> Unit,
+    shouldShowTapIndicator: Boolean,
+    shouldShowMinimizeIndicator: Boolean,
+    updateBottomSheetHeight: (Int) -> Unit,
+    bottomSheetHeight: Int,
 ) {
 
     val context = LocalContext.current
@@ -329,6 +350,7 @@ private fun MainPreviewScreen(
                 info = info,
                 onPreviewWebInfo = onPreviewWebInfo,
                 onScale = onScale,
+                updateBottomSheetHeight = updateBottomSheetHeight,
             )
 
 
@@ -365,8 +387,79 @@ private fun MainPreviewScreen(
                             info = info,
                             minimized = bottomSheetMinimized,
                             onScale = onScale,
-                            contentDesc = stringResource(id = R.string.bottom_sheet_compact)
+                            contentDesc = stringResource(id = R.string.bottom_sheet_compact),
+                            updateBottomSheetHeight = updateBottomSheetHeight,
                         )
+
+                        if(shouldShowMinimizeIndicator) {
+                            Box(Modifier
+                                .fillMaxSize()
+                                .padding(
+                                    end = 16.dp,
+                                    bottom = with(LocalDensity.current) { bottomSheetHeight.toDp() },
+                                ), contentAlignment = Alignment.BottomEnd) {
+                                Column(horizontalAlignment = Alignment.End) {
+                                    val infiniteTransition = rememberInfiniteTransition()
+                                    val position by infiniteTransition.animateFloat(
+                                        initialValue = 12f,
+                                        targetValue = -12f,
+                                        animationSpec = infiniteRepeatable(
+                                            tween(350),
+                                            RepeatMode.Reverse
+                                        )
+                                    )
+                                    Text(
+                                        text = stringResource(id = R.string.tap_to_minimize_sheet),
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            color = MaterialTheme.colorScheme.primary.copy(0.5f)
+                                        )
+                                    )
+                                    Spacer(Modifier.height(12.dp))
+                                    Icon(
+                                        painterResource(id = R.drawable.arrow_down),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary.copy(0.5f),
+                                        modifier = Modifier
+                                            .offset(y = position.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+
+                    if (shouldShowTapIndicator) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(top = 62.dp), contentAlignment = Alignment.TopCenter
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                val infiniteTransition = rememberInfiniteTransition()
+                                val position by infiniteTransition.animateFloat(
+                                    initialValue = -12f,
+                                    targetValue = 12f,
+                                    animationSpec = infiniteRepeatable(
+                                        tween(350),
+                                        RepeatMode.Reverse
+                                    )
+                                )
+                                Icon(
+                                    painterResource(id = R.drawable.arrow_up),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary.copy(0.5f),
+                                    modifier = Modifier
+                                        .offset(y = position.dp)
+                                )
+                                Spacer(Modifier.height(12.dp))
+                                Text(
+                                    text = stringResource(id = R.string.tap_to_start_classification),
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        color = MaterialTheme.colorScheme.primary.copy(0.5f)
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }

@@ -20,6 +20,7 @@ import com.nkoyo.componentidentifier.ui.components.DarkThemeConfigSettings
 import com.nkoyo.componentidentifier.ui.components.TestRecord
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,6 +36,8 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 
 const val KEY_SELECTED_HISTORY_ID = "selected_history_id"
+const val KEY_TAP_INDICATOR = "key_tap_indicator"
+const val KEY_MINIMIZE_INDICATOR = "key_minimize_indicator"
 const val KEY_SELECTED_URL = "selected_url"
 const val EMPTY_FILE = "file://dev/null"
 
@@ -66,7 +69,7 @@ class MainViewModel @Inject constructor(
     private var _bottomSheetMinimized = MutableStateFlow(true)
     val bottomSheetMinimized: StateFlow<Boolean> = _bottomSheetMinimized
 
-    private var _classificationState = MutableStateFlow(true)
+    private var _classificationState = MutableStateFlow(false)
     val classificationState: StateFlow<Boolean> = _classificationState
 
     private var _menuState = MutableStateFlow(false)
@@ -77,6 +80,9 @@ class MainViewModel @Inject constructor(
 
     private val _savedImageUri = MutableStateFlow<Uri>(Uri.parse(EMPTY_FILE))
     val savedImageUri: StateFlow<Uri> = _savedImageUri
+
+    private val _bottomSheetHeight = MutableStateFlow<Int>(0)
+    val bottomSheetHeight: StateFlow<Int> = _bottomSheetHeight
 
     val darkThemeConfigSettings: StateFlow<DarkThemeConfigSettings> = preferences.userData.map {
         DarkThemeConfigSettings(it.darkThemeConfig)
@@ -120,6 +126,14 @@ class MainViewModel @Inject constructor(
         key = KEY_SELECTED_HISTORY_ID, initialValue = -1L,
     )
 
+    val tapIndicatorState: StateFlow<Boolean> = savedStateHandle.getStateFlow(
+        key = KEY_TAP_INDICATOR, initialValue = true
+    )
+
+    val minimizeIndicatorState: StateFlow<Boolean> = savedStateHandle.getStateFlow(
+        key = KEY_MINIMIZE_INDICATOR, initialValue = false
+    )
+
     private val _selectedHistoryEntity = MutableStateFlow<HistoryEntity?>(null)
     val selectedHistoryEntity: StateFlow<HistoryEntity?> = _selectedHistoryEntity
 
@@ -129,6 +143,22 @@ class MainViewModel @Inject constructor(
 
     fun updateSavedUri(uri: Uri) {
         _savedImageUri.value = uri
+    }
+
+    fun updateBottomSheetHeight(height: Int) {
+        _bottomSheetHeight.value = height
+    }
+
+    fun clearTapIndicator() {
+        viewModelScope.launch {
+            savedStateHandle[KEY_TAP_INDICATOR] = false
+            delay(7_000)
+            savedStateHandle[KEY_MINIMIZE_INDICATOR] = true
+        }
+    }
+
+    fun clearMinimizeIndicator() {
+        savedStateHandle[KEY_MINIMIZE_INDICATOR] = false
     }
 
     fun clearSavedUri() {

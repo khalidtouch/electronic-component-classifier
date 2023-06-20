@@ -881,12 +881,6 @@ class MainScreenTest {
                 com.nkoyo.componentidentifier.R.string.circular_progress_indicator
             )
         ).assertDoesNotExist()
-
-        composeTestRule.onNodeWithContentDescription(
-            composeTestRule.activity.resources.getString(
-                com.nkoyo.componentidentifier.R.string.minimize_button
-            )
-        ).performClick()
     }
 
 }

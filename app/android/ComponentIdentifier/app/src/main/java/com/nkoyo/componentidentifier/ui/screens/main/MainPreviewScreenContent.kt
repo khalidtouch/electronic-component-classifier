@@ -56,6 +56,7 @@ fun MainPreviewScreenContent(
     info: ComponentInfo,
     onPreviewWebInfo: () -> Unit,
     onScale: () -> Unit,
+    updateBottomSheetHeight: (Int) -> Unit,
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -118,7 +119,8 @@ fun MainPreviewScreenContent(
                             minimized = bottomSheetMinimized,
                             onScale = onScale,
                             info = info,
-                            contentDesc = stringResource(id = R.string.large_and_medium_bottom_sheet)
+                            contentDesc = stringResource(id = R.string.large_and_medium_bottom_sheet),
+                            updateBottomSheetHeight = updateBottomSheetHeight,
                         )
                     }
                 }

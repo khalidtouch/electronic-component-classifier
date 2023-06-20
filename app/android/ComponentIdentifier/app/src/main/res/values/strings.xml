@@ -54,4 +54,6 @@
     <string name="show_record_button">button:show_record</string>
     <string name="snapshot_button">button:snapshot</string>
     <string name="camera_flip_button">button:camera_flip</string>
+    <string name="tap_to_start_classification">Tap to Start Classification</string>
+    <string name="tap_to_minimize_sheet">Tap to Minimize Sheet</string>
 </resources>

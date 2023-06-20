@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -44,8 +45,8 @@ import java.time.LocalDateTime
 
 @Composable
 fun DynamicBottomSheet(
+    modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
-    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
     maxWidth: Dp,
     maxHeight: Dp,
     onPreviewWebInfo: () -> Unit,
@@ -56,6 +57,7 @@ fun DynamicBottomSheet(
     onScale: () -> Unit,
     info: ComponentInfo,
     contentDesc: String,
+    updateBottomSheetHeight: (Int) -> Unit,
 ) {
     DynamicBottomSheet(
         modifier = modifier,
@@ -69,6 +71,7 @@ fun DynamicBottomSheet(
         windowSizeClass = windowSizeClass,
         onScale = onScale,
         contentDesc = contentDesc,
+        updateBottomSheetHeight = updateBottomSheetHeight,
     )
 }
 
@@ -86,6 +89,7 @@ private fun DynamicBottomSheet(
     info: ComponentInfo,
     contentDesc: String,
     windowSizeClass: WindowSizeClass,
+    updateBottomSheetHeight: (Int) -> Unit,
 ) {
     val calculatedHeight = if (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact) {
         maxHeight.times(0.4f)
@@ -97,6 +101,7 @@ private fun DynamicBottomSheet(
         modifier = modifier
             .height(height)
             .width(width)
+            .onGloballyPositioned { updateBottomSheetHeight(it.size.height) }
             .semantics { contentDescription = contentDesc },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp,
@@ -126,11 +131,15 @@ private fun DynamicBottomSheet(
             }
 
 
-            Box(Modifier.padding(16.dp)) {
+            Box(
+                Modifier.padding(
+                    start = 16.dp, end = 8.dp, top = 16.dp, bottom = 16.dp
+                )
+            ) {
                 Box(
                     modifier = modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp), contentAlignment = Alignment.CenterEnd
+                        .padding(horizontal = 0.dp), contentAlignment = Alignment.CenterEnd
                 ) {
                     CircleIconButton(
                         icon = R.drawable.icon_minimize,
@@ -145,7 +154,7 @@ private fun DynamicBottomSheet(
 
                 Spacer(modifier = modifier.height(12.dp))
 
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+                Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
                     Text(
                         text = info.componentName,
                         style = MaterialTheme.typography.headlineMedium.copy(
@@ -163,8 +172,8 @@ private fun DynamicBottomSheet(
                         overflow = TextOverflow.Ellipsis,
                     )
                     Spacer(Modifier.height(24.dp))
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        if(info.componentName.isNotBlank()) {
+                    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        if (info.componentName.isNotBlank()) {
                             SecondaryButton(
                                 label = stringResource(id = R.string.read_more),
                                 onClick = {

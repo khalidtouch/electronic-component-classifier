@@ -63,6 +63,9 @@ fun MainScreen(
     val classificationState by mainViewModel.classificationState.collectAsStateWithLifecycle()
     val result by mainViewModel.result.collectAsStateWithLifecycle()
     val resultBuffer by mainViewModel.resultBuffer.collectAsStateWithLifecycle()
+    val shouldShowTapIndicator by mainViewModel.tapIndicatorState.collectAsStateWithLifecycle()
+    val shouldShowMinimizeIndicator by mainViewModel.minimizeIndicatorState.collectAsStateWithLifecycle()
+    val bottomSheetHeight by mainViewModel.bottomSheetHeight.collectAsStateWithLifecycle()
 
     val orientationEventListener by lazy {
         object : OrientationEventListener(context) {
@@ -93,8 +96,8 @@ fun MainScreen(
         windowSizeClass = windowSizeClass,
         clearSavedUri = mainViewModel::clearSavedUri,
         initializeApp = {
-            mainViewModel.onBottomSheetMinimizedChanged(true)
-            mainViewModel.updateClassificationState(true)
+            mainViewModel.onBottomSheetMinimizedChanged(false)
+            mainViewModel.updateClassificationState(false)
         },
         onTakeSnapshot = { imageCapture ->
             mainViewModel.updateResultLabel(result.label.uppercase())
@@ -128,9 +131,17 @@ fun MainScreen(
         classificationState = classificationState,
         minimizeBottomSheet = { mainViewModel.onBottomSheetMinimizedChanged(true) },
         expandBottomSheet = { mainViewModel.onBottomSheetMinimizedChanged(false) },
-        onScale = { mainViewModel.updateClassificationState(!classificationState) },
+        onScale = {
+            mainViewModel.updateClassificationState(!classificationState)
+            if (shouldShowTapIndicator) mainViewModel.clearTapIndicator()
+            if(shouldShowMinimizeIndicator) mainViewModel.clearMinimizeIndicator()
+        },
         openUrl = mainViewModel::openWebUrl,
         result = result,
+        shouldShowTapIndicator = shouldShowTapIndicator,
+        shouldShowMinimizeIndicator = shouldShowMinimizeIndicator,
+        updateBottomSheetHeight = mainViewModel::updateBottomSheetHeight,
+        bottomSheetHeight = bottomSheetHeight,
     )
 }
 
@@ -169,6 +180,10 @@ fun MainScreen(
     minimizeBottomSheet: () -> Unit,
     expandBottomSheet: () -> Unit,
     onBufferResult: (HighestProbabilityComponent) -> Unit,
+    shouldShowTapIndicator: Boolean,
+    shouldShowMinimizeIndicator: Boolean,
+    updateBottomSheetHeight: (Int) -> Unit,
+    bottomSheetHeight: Int,
 ) {
     if (imageUri != emptyImageUri) {
         PhotoCaptureScreen(
@@ -205,6 +220,10 @@ fun MainScreen(
             onGettingApplicationStarted = onGettingApplicationStarted,
             onAbort = onAbort,
             updateResult = updateResult,
+            shouldShowTapIndicator = shouldShowTapIndicator,
+            shouldShowMinimizeIndicator = shouldShowMinimizeIndicator,
+            updateBottomSheetHeight = updateBottomSheetHeight,
+            bottomSheetHeight = bottomSheetHeight,
         )
     }
 }
