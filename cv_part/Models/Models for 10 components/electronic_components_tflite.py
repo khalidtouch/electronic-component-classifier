@@ -21,16 +21,16 @@ import tensorflow as tf
 
 from google.colab import files # For downloading Files
 from google.colab import drive # For Mounting Google drive
-import os
+# import os
 import numpy as np
 import matplotlib.pyplot as plt
 import pathlib
-from tensorflow.keras import regularizers
+# from tensorflow.keras import regularizers
 
 
 from sklearn.metrics import roc_curve, auc
 from sklearn.preprocessing import label_binarize
-from sklearn.metrics import precision_recall_curve, average_precision_score
+# from sklearn.metrics import precision_recall_curve, average_precision_score
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 from sklearn.metrics import precision_score, recall_score, f1_score
@@ -398,8 +398,6 @@ plt.title('Training and Validation Loss')
 plt.xlabel('epoch')
 plt.show()
 
-# Assuming you have already trained your model
-
 # Evaluate model on the testing set
 test_loss, test_accuracy = model.evaluate(test_generator)
 
@@ -408,7 +406,7 @@ print(f'Test Accuracy: {test_accuracy:.2f}')
 
 """Precision, Recall, F1"""
 
-# Make predictions on the validation data
+# Make predictions on the test data
 y_true = test_generator.classes
 y_pred = model.predict(test_generator)
 y_pred_labels = np.argmax(y_pred, axis=1)  # Convert predicted probabilities to class labels
@@ -429,7 +427,7 @@ print(f'F1 Score: {f1:.2f}')
 
 """Confusion Matrix"""
 
-# Step 1: Make predictions on the validation data
+# Step 1: Make predictions on the test data
 y_true = test_generator.classes
 y_pred = model.predict(test_generator)
 y_pred_classes = np.argmax(y_pred, axis=1)
@@ -447,7 +445,7 @@ plt.show()
 
 """ROC Curve + AUC"""
 
-# Step 1: Make predictions on the validation data
+# Step 1: Make predictions on the test data
 y_pred_prob = model.predict(test_generator)
 y_true = test_generator.classes
 num_classes = test_generator.num_classes
@@ -529,8 +527,6 @@ plt.title('Training and Validation Loss')
 plt.xlabel('epoch')
 plt.show()
 
-# Assuming you have already trained your model
-
 # Evaluate model on the testing set
 test_loss, test_accuracy = model.evaluate(test_generator)
 
@@ -539,7 +535,7 @@ print(f'Test Accuracy: {test_accuracy:.2f}')
 
 """Precision, Recall, F1 # second iteration"""
 
-# Make predictions on the validation data
+# Make predictions on the test data
 y_true = test_generator.classes
 y_pred = model.predict(test_generator)
 y_pred_labels = np.argmax(y_pred, axis=1)  # Convert predicted probabilities to class labels
@@ -560,7 +556,7 @@ print(f'F1 Score: {f1:.2f}')
 
 """Confusion Matrix # second iteration"""
 
-# Step 1: Make predictions on the validation data
+# Step 1: Make predictions on the test data
 y_true = test_generator.classes
 y_pred = model.predict(test_generator)
 y_pred_classes = np.argmax(y_pred, axis=1)
@@ -578,7 +574,7 @@ plt.show()
 
 """ROC Curve + AUC # second iteration"""
 
-# Step 1: Make predictions on the validation data
+# Step 1: Make predictions on the test data
 y_pred_prob = model.predict(test_generator)
 y_true = test_generator.classes
 num_classes = test_generator.num_classes
@@ -666,7 +662,7 @@ history_fine = model.fit(train_generator,
                          validation_data=val_generator,
                          validation_steps=len(val_generator))
 
-"""Accuracy and Loss # second iteration
+"""Accuracy and Loss # fine tuned
 
 
 """
@@ -698,17 +694,18 @@ plt.title('Training and Validation Loss')
 plt.xlabel('epoch')
 plt.show()
 
-# Assuming you have already trained your model
-
 # Evaluate model on the testing set
 test_loss, test_accuracy = model.evaluate(test_generator)
 
 print(f'Test Loss: {test_loss:.2f}')
 print(f'Test Accuracy: {test_accuracy:.2f}')
 
-"""Precision, Recall, F1 # second iteration"""
+"""Precision, Recall, F1 # fine tuned
 
-# Make predictions on the validation data
+
+"""
+
+# Make predictions on the test data
 y_true = test_generator.classes
 y_pred = model.predict(test_generator)
 y_pred_labels = np.argmax(y_pred, axis=1)  # Convert predicted probabilities to class labels
@@ -727,9 +724,9 @@ print(f'Precision: {precision:.2f}')
 print(f'Recall: {recall:.2f}')
 print(f'F1 Score: {f1:.2f}')
 
-"""Confusion Matrix # second iteration"""
+"""Confusion Matrix # fine tuned"""
 
-# Step 1: Make predictions on the validation data
+# Step 1: Make predictions on the test data
 y_true = test_generator.classes
 y_pred = model.predict(test_generator)
 y_pred_classes = np.argmax(y_pred, axis=1)
@@ -745,9 +742,9 @@ plt.ylabel("True Class")
 plt.title("Confusion Matrix")
 plt.show()
 
-"""ROC Curve + AUC # second iteration"""
+"""ROC Curve + AUC # fine tuned"""
 
-# Step 1: Make predictions on the validation data
+# Step 1: Make predictions on the test data
 y_pred_prob = model.predict(test_generator)
 y_true = test_generator.classes
 num_classes = test_generator.num_classes
