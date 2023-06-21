@@ -25,7 +25,6 @@ import com.nkoyo.componentidentifier.ui.viewmodel.MainViewModel
  */
 
 @RequiresApi(Build.VERSION_CODES.R)
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun NavHostWrapper(
     modifier: Modifier = Modifier,

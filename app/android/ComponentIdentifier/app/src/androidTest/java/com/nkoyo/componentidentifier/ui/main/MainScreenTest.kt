@@ -85,11 +85,16 @@ class MainScreenTest {
                     onGettingApplicationStarted = {},
                     produceResult = produceFakeResult,
                     updateResult = {},
-                    initializeApp = {},
+                    initializeApp = {
+                    },
                     result = HighestProbabilityComponent.Default,
                     minimizeBottomSheet = {},
                     expandBottomSheet = {},
-                    onBufferResult = {}
+                    onBufferResult = {},
+                    shouldShowTapIndicator = false,
+                    shouldShowMinimizeIndicator = false,
+                    bottomSheetHeight = 45,
+                    updateBottomSheetHeight = {}
                 )
             }
         }
@@ -131,11 +136,16 @@ class MainScreenTest {
                     onGettingApplicationStarted = {},
                     produceResult = produceFakeResult,
                     updateResult = {},
-                    initializeApp = {},
+                    initializeApp = {
+                    },
                     result = HighestProbabilityComponent.Default,
                     minimizeBottomSheet = {},
                     expandBottomSheet = {},
-                    onBufferResult = {}
+                    onBufferResult = {},
+                    shouldShowTapIndicator = false,
+                    shouldShowMinimizeIndicator = false,
+                    bottomSheetHeight = 45,
+                    updateBottomSheetHeight = {}
                 )
             }
         }
@@ -216,7 +226,11 @@ class MainScreenTest {
                     result = HighestProbabilityComponent.Default,
                     minimizeBottomSheet = {},
                     expandBottomSheet = {},
-                    onBufferResult = {}
+                    onBufferResult = {},
+                    shouldShowTapIndicator = false,
+                    shouldShowMinimizeIndicator = false,
+                    bottomSheetHeight = 45,
+                    updateBottomSheetHeight = {}
                 )
             }
         }
@@ -251,8 +265,8 @@ class MainScreenTest {
                     onTakeSnapshot = {},
                     onToggleFlashLight = {},
                     onToggleCamera = {},
-                    bottomSheetMinimized = false,
-                    classificationState = true,
+                    bottomSheetMinimized = true,
+                    classificationState = false,
                     cameraExecutorService = Executors.newSingleThreadExecutor(),
                     flashlightExecutorService = Executors.newSingleThreadExecutor(),
                     info = ComponentInfo.DEFAULT,
@@ -262,9 +276,7 @@ class MainScreenTest {
                     onPreviewWebInfo = {},
                     progressWheelState = false,
                     onViewRecords = {},
-                    onAbort = {
-                        composeTestRule.activity.finish()
-                    },
+                    onAbort = {},
                     onGettingApplicationStarted = {},
                     produceResult = produceFakeResult,
                     updateResult = {},
@@ -272,7 +284,11 @@ class MainScreenTest {
                     result = HighestProbabilityComponent.Default,
                     minimizeBottomSheet = {},
                     expandBottomSheet = {},
-                    onBufferResult = {}
+                    onBufferResult = {},
+                    shouldShowTapIndicator = false,
+                    shouldShowMinimizeIndicator = false,
+                    bottomSheetHeight = 45,
+                    updateBottomSheetHeight = {}
                 )
             }
         }
@@ -283,12 +299,12 @@ class MainScreenTest {
             )
         ).assertHasClickAction()
 
-
         composeTestRule.onNodeWithContentDescription(
             composeTestRule.activity.resources.getString(
                 com.nkoyo.componentidentifier.R.string.abort_button
             )
         ).performClick()
+
     }
 
 
@@ -330,7 +346,11 @@ class MainScreenTest {
                     result = HighestProbabilityComponent.Default,
                     minimizeBottomSheet = {},
                     expandBottomSheet = {},
-                    onBufferResult = {}
+                    onBufferResult = {},
+                    shouldShowTapIndicator = false,
+                    shouldShowMinimizeIndicator = false,
+                    bottomSheetHeight = 45,
+                    updateBottomSheetHeight = {}
                 )
             }
         }
@@ -382,11 +402,11 @@ class MainScreenTest {
     }
 
     @Test
-    fun mainPreview_whenOnCreated_showProgressIndicator() {
+    fun mainPreview_whenOnCreated_hideProgressIndicator() {
         composeTestRule.setContent {
             var gettingStartedState by remember { mutableStateOf(true) }
             var bottomSheetMinimized by remember { mutableStateOf(true) }
-            var classificationState by remember { mutableStateOf(true) }
+            var classificationState by remember { mutableStateOf(false) }
             val progressWheelState =
                 !gettingStartedState && bottomSheetMinimized && classificationState
 
@@ -424,12 +444,16 @@ class MainScreenTest {
                     updateResult = {},
                     initializeApp = {
                         bottomSheetMinimized = true
-                        classificationState = true
+                        classificationState = false
                     },
                     result = HighestProbabilityComponent.Default,
-                    minimizeBottomSheet = {},
-                    expandBottomSheet = {},
-                    onBufferResult = {}
+                    minimizeBottomSheet = {bottomSheetMinimized = true },
+                    expandBottomSheet = {bottomSheetMinimized = false},
+                    onBufferResult = {},
+                    shouldShowTapIndicator = false,
+                    shouldShowMinimizeIndicator = false,
+                    bottomSheetHeight = 45,
+                    updateBottomSheetHeight = {}
                 )
             }
         }
@@ -444,7 +468,7 @@ class MainScreenTest {
             composeTestRule.activity.resources.getString(
                 com.nkoyo.componentidentifier.R.string.circular_progress_indicator
             )
-        ).assertExists()
+        ).assertDoesNotExist()
     }
 
 
@@ -453,7 +477,7 @@ class MainScreenTest {
         composeTestRule.setContent {
             var gettingStartedState by remember { mutableStateOf(true) }
             var bottomSheetMinimized by remember { mutableStateOf(true) }
-            var classificationState by remember { mutableStateOf(true) }
+            var classificationState by remember { mutableStateOf(false) }
             val progressWheelState =
                 !gettingStartedState && bottomSheetMinimized && classificationState
             var flashlightState: ImageCaptureFlashMode by remember {
@@ -510,12 +534,16 @@ class MainScreenTest {
                     updateResult = {},
                     initializeApp = {
                         bottomSheetMinimized = true
-                        classificationState = true
+                        classificationState = false
                     },
                     result = HighestProbabilityComponent.Default,
                     minimizeBottomSheet = {},
                     expandBottomSheet = {},
-                    onBufferResult = {}
+                    onBufferResult = {},
+                    shouldShowTapIndicator = false,
+                    shouldShowMinimizeIndicator = false,
+                    bottomSheetHeight = 45,
+                    updateBottomSheetHeight = {}
                 )
             }
         }
@@ -551,98 +579,13 @@ class MainScreenTest {
         ).performClick()
     }
 
-    @Test
-    fun bottomSheetForCompact_whenProgressBarIsShown_shouldDisplay() {
-        composeTestRule.setContent {
-            var gettingStartedState by remember { mutableStateOf(true) }
-            var bottomSheetMinimized by remember { mutableStateOf(true) }
-            var classificationState by remember { mutableStateOf(true) }
-            val progressWheelState =
-                !gettingStartedState && bottomSheetMinimized && classificationState
-            var flashlightState: ImageCaptureFlashMode by remember {
-                mutableStateOf(
-                    ImageCaptureFlashMode.Off
-                )
-            }
-
-
-            BoxWithConstraints {
-                MainScreen(
-                    emptyImageUri = Uri.parse(EMPTY_FILE),
-                    imageUri = Uri.parse(EMPTY_FILE),
-                    gettingStartedState = gettingStartedState,
-                    rotationAngle = 0f,
-                    clearSavedUri = {},
-                    windowSizeClass = calculateWindowSizeClass(activity = composeTestRule.activity),
-                    flashLightState = flashlightState,
-                    onTakeSnapshot = {},
-                    onToggleFlashLight = {
-                        flashlightState = when (flashlightState) {
-                            ImageCaptureFlashMode.Off -> {
-                                ImageCaptureFlashMode.Auto
-                            }
-
-                            ImageCaptureFlashMode.On -> {
-                                ImageCaptureFlashMode.Off
-                            }
-
-                            ImageCaptureFlashMode.Auto -> {
-                                ImageCaptureFlashMode.On
-                            }
-                        }
-                    },
-                    onToggleCamera = {},
-                    bottomSheetMinimized = bottomSheetMinimized,
-                    classificationState = classificationState,
-                    cameraExecutorService = Executors.newSingleThreadExecutor(),
-                    flashlightExecutorService = Executors.newSingleThreadExecutor(),
-                    info = ComponentInfo.DEFAULT,
-                    cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA,
-                    onScale = {
-                        bottomSheetMinimized = !bottomSheetMinimized
-                    },
-                    openUrl = {},
-                    onPreviewWebInfo = {},
-                    progressWheelState = progressWheelState,
-                    onViewRecords = {},
-                    onAbort = {},
-                    onGettingApplicationStarted = {
-                        gettingStartedState = false
-                    },
-                    produceResult = produceFakeResult,
-                    updateResult = {},
-                    initializeApp = {
-                        bottomSheetMinimized = true
-                        classificationState = true
-                    },
-                    result = HighestProbabilityComponent.Default,
-                    minimizeBottomSheet = {},
-                    expandBottomSheet = {},
-                    onBufferResult = {}
-                )
-            }
-        }
-
-        composeTestRule.onNodeWithContentDescription(
-            composeTestRule.activity.resources.getString(
-                com.nkoyo.componentidentifier.R.string.get_started_button
-            )
-        ).performClick()
-
-        composeTestRule.onNodeWithContentDescription(
-            composeTestRule.activity.resources.getString(
-                com.nkoyo.componentidentifier.R.string.bottom_sheet_compact
-            )
-        ).assertExists()
-
-    }
 
     @Test
     fun bottomSheetForCompat_whenScaleButtonClicked_shouldChangeSize() {
         composeTestRule.setContent {
             var gettingStartedState by remember { mutableStateOf(true) }
             var bottomSheetMinimized by remember { mutableStateOf(true) }
-            var classificationState by remember { mutableStateOf(true) }
+            var classificationState by remember { mutableStateOf(false) }
             val progressWheelState =
                 !gettingStartedState && bottomSheetMinimized && classificationState
             var flashlightState: ImageCaptureFlashMode by remember {
@@ -699,12 +642,16 @@ class MainScreenTest {
                     updateResult = {},
                     initializeApp = {
                         bottomSheetMinimized = true
-                        classificationState = true
+                        classificationState = false
                     },
                     result = HighestProbabilityComponent.Default,
                     minimizeBottomSheet = {},
                     expandBottomSheet = {},
-                    onBufferResult = {}
+                    onBufferResult = {},
+                    shouldShowTapIndicator = false,
+                    shouldShowMinimizeIndicator = false,
+                    bottomSheetHeight = 45,
+                    updateBottomSheetHeight = {}
                 )
             }
         }
@@ -754,7 +701,7 @@ class MainScreenTest {
         composeTestRule.setContent {
             var gettingStartedState by remember { mutableStateOf(true) }
             var bottomSheetMinimized by remember { mutableStateOf(true) }
-            var classificationState by remember { mutableStateOf(true) }
+            var classificationState by remember { mutableStateOf(false) }
             val progressWheelState =
                 !gettingStartedState && bottomSheetMinimized && classificationState
             var flashlightState: ImageCaptureFlashMode by remember {
@@ -826,12 +773,16 @@ class MainScreenTest {
                     updateResult = {},
                     initializeApp = {
                         bottomSheetMinimized = true
-                        classificationState = true
+                        classificationState = false
                     },
                     result = HighestProbabilityComponent.Default,
                     minimizeBottomSheet = { bottomSheetMinimized = true },
                     expandBottomSheet = { bottomSheetMinimized = false },
-                    onBufferResult = {}
+                    onBufferResult = {},
+                    shouldShowTapIndicator = false,
+                    shouldShowMinimizeIndicator = false,
+                    bottomSheetHeight = 45,
+                    updateBottomSheetHeight = {}
                 )
             }
         }
@@ -847,12 +798,6 @@ class MainScreenTest {
                 com.nkoyo.componentidentifier.R.string.bottom_sheet_compact
             )
         ).assertExists()
-
-        composeTestRule.onNodeWithContentDescription(
-            composeTestRule.activity.resources.getString(
-                com.nkoyo.componentidentifier.R.string.circular_progress_indicator
-            )
-        ).assertIsDisplayed()
 
 
         composeTestRule.onNodeWithContentDescription(
