@@ -44,13 +44,11 @@ fun MainScreen(
     onAbortApplication: () -> Unit = {},
     onViewRecords: () -> Unit,
     onPreviewWebInfo: () -> Unit,
-    emptyImageUri: Uri = Uri.parse("file://dev/null"),
 ) {
     val TAG = "MainScreen"
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var rotationAngle by remember { mutableStateOf(0f) }
-    val imageUri = remember { mutableStateOf(emptyImageUri) }
     val highestProbabilityComponentLabel by mainViewModel.highestProbabilityComponentLabel.collectAsStateWithLifecycle()
     val savedImageUri by mainViewModel.savedImageUri.collectAsStateWithLifecycle()
     val progressWheelState by mainViewModel.progressWheelState.collectAsStateWithLifecycle()
@@ -66,6 +64,7 @@ fun MainScreen(
     val shouldShowTapIndicator by mainViewModel.tapIndicatorState.collectAsStateWithLifecycle()
     val shouldShowMinimizeIndicator by mainViewModel.minimizeIndicatorState.collectAsStateWithLifecycle()
     val bottomSheetHeight by mainViewModel.bottomSheetHeight.collectAsStateWithLifecycle()
+    val shouldShowPhotoCaptureScreen by mainViewModel.shouldShowPhotoCaptureScreen.collectAsStateWithLifecycle()
 
     val orientationEventListener by lazy {
         object : OrientationEventListener(context) {
@@ -82,16 +81,15 @@ fun MainScreen(
     }
 
     val onSavePhotoFile: (File) -> Unit = {
-        imageUri.value = it.toUri()
+        mainViewModel.updateSavedUri(it.toUri())
         mainViewModel.registerHistory(
             componentName = highestProbabilityComponentLabel,
-            imageUrl = imageUri.value.toString(),
+            imageUrl = savedImageUri.toString(),
         )
     }
 
     MainScreen(
         imageUri = savedImageUri,
-        emptyImageUri = Uri.parse(EMPTY_FILE),
         rotationAngle = rotationAngle,
         windowSizeClass = windowSizeClass,
         clearSavedUri = mainViewModel::clearSavedUri,
@@ -142,6 +140,7 @@ fun MainScreen(
         shouldShowMinimizeIndicator = shouldShowMinimizeIndicator,
         updateBottomSheetHeight = mainViewModel::updateBottomSheetHeight,
         bottomSheetHeight = bottomSheetHeight,
+        shouldShowPhotoCaptureScreen = shouldShowPhotoCaptureScreen,
     )
 }
 
@@ -150,7 +149,6 @@ fun MainScreen(
 @Composable
 fun MainScreen(
     imageUri: Uri,
-    emptyImageUri: Uri,
     rotationAngle: Float,
     clearSavedUri: () -> Unit,
     modifier: Modifier = Modifier,
@@ -184,8 +182,9 @@ fun MainScreen(
     shouldShowMinimizeIndicator: Boolean,
     updateBottomSheetHeight: (Int) -> Unit,
     bottomSheetHeight: Int,
+    shouldShowPhotoCaptureScreen: Boolean,
 ) {
-    if (imageUri != emptyImageUri) {
+    if (shouldShowPhotoCaptureScreen) {
         PhotoCaptureScreen(
             imageUri = imageUri,
             rotationAngle = rotationAngle,

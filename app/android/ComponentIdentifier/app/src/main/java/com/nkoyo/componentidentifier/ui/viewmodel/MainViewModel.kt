@@ -54,6 +54,7 @@ class MainViewModel @Inject constructor(
         initialize() //initialize Classifier
     }
 
+
     private val _cameraSelector =
         MutableStateFlow<CameraSelector>(CameraSelector.DEFAULT_BACK_CAMERA)
     val cameraSelector: StateFlow<CameraSelector> = _cameraSelector
@@ -82,6 +83,15 @@ class MainViewModel @Inject constructor(
 
     private val _bottomSheetHeight = MutableStateFlow<Int>(0)
     val bottomSheetHeight: StateFlow<Int> = _bottomSheetHeight
+
+
+    val shouldShowPhotoCaptureScreen: StateFlow<Boolean> = _savedImageUri.map {
+        it != Uri.parse(EMPTY_FILE)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = false,
+    )
 
     val darkThemeConfigSettings: StateFlow<DarkThemeConfigSettings> = preferences.userData.map {
         DarkThemeConfigSettings(it.darkThemeConfig)
@@ -154,6 +164,7 @@ class MainViewModel @Inject constructor(
     fun updateSavedUri(uri: Uri) {
         _savedImageUri.value = uri
     }
+
 
     fun completeFirstClassification() {
         _firstClassificationState.value = false
