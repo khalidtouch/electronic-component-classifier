@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.nkoyo.componentidentifier.domain.extensions.asString
@@ -82,17 +83,23 @@ private fun HistoryListItem(
                 text = item.componentName,
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
-                )
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             Spacer(Modifier.height(8.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
                     text = item.value,
                     style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = item.dateTime.asString(),
                     style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
 

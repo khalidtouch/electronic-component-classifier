@@ -3,6 +3,7 @@ package com.nkoyo.componentidentifier.ui.screens.main
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.view.OrientationEventListener
 import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
@@ -84,8 +85,9 @@ fun MainScreen(
         mainViewModel.updateSavedUri(it.toUri())
         mainViewModel.registerHistory(
             componentName = highestProbabilityComponentLabel,
-            imageUrl = savedImageUri.toString(),
+            imageUrl = it.toUri().toString(),
         )
+        Log.e(TAG, "MainScreen: image ${it.toUri().toString()} has been saved to db")
     }
 
     MainScreen(

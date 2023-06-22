@@ -60,7 +60,6 @@ class MainScreenTest {
         composeTestRule.setContent {
             BoxWithConstraints {
                 MainScreen(
-                    emptyImageUri = Uri.parse(EMPTY_FILE),
                     imageUri = Uri.parse(EMPTY_FILE),
                     gettingStartedState = true,
                     rotationAngle = 0f,
@@ -94,7 +93,8 @@ class MainScreenTest {
                     shouldShowTapIndicator = false,
                     shouldShowMinimizeIndicator = false,
                     bottomSheetHeight = 45,
-                    updateBottomSheetHeight = {}
+                    updateBottomSheetHeight = {},
+                    shouldShowPhotoCaptureScreen = false,
                 )
             }
         }
@@ -111,7 +111,7 @@ class MainScreenTest {
         composeTestRule.setContent {
             BoxWithConstraints {
                 MainScreen(
-                    emptyImageUri = Uri.parse(EMPTY_FILE),
+
                     imageUri = Uri.parse(EMPTY_FILE),
                     gettingStartedState = true,
                     rotationAngle = 0f,
@@ -145,7 +145,8 @@ class MainScreenTest {
                     shouldShowTapIndicator = false,
                     shouldShowMinimizeIndicator = false,
                     bottomSheetHeight = 45,
-                    updateBottomSheetHeight = {}
+                    updateBottomSheetHeight = {},
+                    shouldShowPhotoCaptureScreen = false,
                 )
             }
         }
@@ -197,7 +198,7 @@ class MainScreenTest {
         composeTestRule.setContent {
             BoxWithConstraints {
                 MainScreen(
-                    emptyImageUri = Uri.parse(EMPTY_FILE),
+
                     imageUri = Uri.parse(EMPTY_FILE),
                     gettingStartedState = true,
                     rotationAngle = 0f,
@@ -230,7 +231,8 @@ class MainScreenTest {
                     shouldShowTapIndicator = false,
                     shouldShowMinimizeIndicator = false,
                     bottomSheetHeight = 45,
-                    updateBottomSheetHeight = {}
+                    updateBottomSheetHeight = {},
+                    shouldShowPhotoCaptureScreen = false,
                 )
             }
         }
@@ -255,7 +257,7 @@ class MainScreenTest {
         composeTestRule.setContent {
             BoxWithConstraints {
                 MainScreen(
-                    emptyImageUri = Uri.parse(EMPTY_FILE),
+
                     imageUri = Uri.parse(EMPTY_FILE),
                     gettingStartedState = true,
                     rotationAngle = 0f,
@@ -288,7 +290,8 @@ class MainScreenTest {
                     shouldShowTapIndicator = false,
                     shouldShowMinimizeIndicator = false,
                     bottomSheetHeight = 45,
-                    updateBottomSheetHeight = {}
+                    updateBottomSheetHeight = {},
+                    shouldShowPhotoCaptureScreen = false,
                 )
             }
         }
@@ -315,7 +318,7 @@ class MainScreenTest {
 
             BoxWithConstraints {
                 MainScreen(
-                    emptyImageUri = Uri.parse(EMPTY_FILE),
+
                     imageUri = Uri.parse(EMPTY_FILE),
                     gettingStartedState = gettingStartedState,
                     rotationAngle = 0f,
@@ -350,7 +353,8 @@ class MainScreenTest {
                     shouldShowTapIndicator = false,
                     shouldShowMinimizeIndicator = false,
                     bottomSheetHeight = 45,
-                    updateBottomSheetHeight = {}
+                    updateBottomSheetHeight = {},
+                    shouldShowPhotoCaptureScreen = false,
                 )
             }
         }
@@ -413,7 +417,7 @@ class MainScreenTest {
 
             BoxWithConstraints {
                 MainScreen(
-                    emptyImageUri = Uri.parse(EMPTY_FILE),
+
                     imageUri = Uri.parse(EMPTY_FILE),
                     gettingStartedState = gettingStartedState,
                     rotationAngle = 0f,
@@ -447,13 +451,14 @@ class MainScreenTest {
                         classificationState = false
                     },
                     result = HighestProbabilityComponent.Default,
-                    minimizeBottomSheet = {bottomSheetMinimized = true },
-                    expandBottomSheet = {bottomSheetMinimized = false},
+                    minimizeBottomSheet = { bottomSheetMinimized = true },
+                    expandBottomSheet = { bottomSheetMinimized = false },
                     onBufferResult = {},
                     shouldShowTapIndicator = false,
                     shouldShowMinimizeIndicator = false,
                     bottomSheetHeight = 45,
-                    updateBottomSheetHeight = {}
+                    updateBottomSheetHeight = {},
+                    shouldShowPhotoCaptureScreen = false,
                 )
             }
         }
@@ -489,7 +494,7 @@ class MainScreenTest {
 
             BoxWithConstraints {
                 MainScreen(
-                    emptyImageUri = Uri.parse(EMPTY_FILE),
+
                     imageUri = Uri.parse(EMPTY_FILE),
                     gettingStartedState = gettingStartedState,
                     rotationAngle = 0f,
@@ -543,7 +548,8 @@ class MainScreenTest {
                     shouldShowTapIndicator = false,
                     shouldShowMinimizeIndicator = false,
                     bottomSheetHeight = 45,
-                    updateBottomSheetHeight = {}
+                    updateBottomSheetHeight = {},
+                    shouldShowPhotoCaptureScreen = false,
                 )
             }
         }
@@ -597,7 +603,7 @@ class MainScreenTest {
 
             BoxWithConstraints {
                 MainScreen(
-                    emptyImageUri = Uri.parse(EMPTY_FILE),
+
                     imageUri = Uri.parse(EMPTY_FILE),
                     gettingStartedState = gettingStartedState,
                     rotationAngle = 0f,
@@ -651,7 +657,8 @@ class MainScreenTest {
                     shouldShowTapIndicator = false,
                     shouldShowMinimizeIndicator = false,
                     bottomSheetHeight = 45,
-                    updateBottomSheetHeight = {}
+                    updateBottomSheetHeight = {},
+                    shouldShowPhotoCaptureScreen = false,
                 )
             }
         }
@@ -726,7 +733,6 @@ class MainScreenTest {
 
             BoxWithConstraints {
                 MainScreen(
-                    emptyImageUri = Uri.parse(EMPTY_FILE),
                     imageUri = Uri.parse(EMPTY_FILE),
                     gettingStartedState = gettingStartedState,
                     rotationAngle = 0f,
@@ -782,7 +788,8 @@ class MainScreenTest {
                     shouldShowTapIndicator = false,
                     shouldShowMinimizeIndicator = false,
                     bottomSheetHeight = 45,
-                    updateBottomSheetHeight = {}
+                    updateBottomSheetHeight = {},
+                    shouldShowPhotoCaptureScreen = false,
                 )
             }
         }
