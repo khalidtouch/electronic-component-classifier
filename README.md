@@ -15,7 +15,7 @@ In this application, the UI was designed using the Figma design tool. Below are 
 
 
 #### Mobile - Light
-![image](screens/Screenshot%20from%202023-07-19%2014-55-21.png)
+![image](screens/Screenshot%20from%202023-07-19%2014-59-38.png)
 ![image](screens/Screenshot%20from%202023-07-19%2014-57-17.png)
 ![image](screens/Screenshot%20from%202023-07-19%2014-57-36.png)
 ![image](screens/Screenshot%20from%202023-07-19%2014-57-50.png)
@@ -38,6 +38,42 @@ In this application, the UI was designed using the Figma design tool. Below are 
 #### Medium - Light 
 ![image](screens/Screenshot%20from%202023-07-19%2015-03-33.png)
 ![image](screens/Screenshot%20from%202023-07-19%2015-03-44.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-03-53.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-04-02.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-04-14.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-04-23.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-04-34.png)
+
+#### Medium - Dark 
+![image](screens/Screenshot%20from%202023-07-19%2015-04-57.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-05-08.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-05-21.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-05-32.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-05-41.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-05-56.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-06-08.png)
+
+
+#### Expanded - Light 
+![image](screens/Screenshot%20from%202023-07-19%2015-06-31.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-06-44.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-06-50.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-06-56.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-07-20.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-07-33.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-07-46.png)
+
+
+#### Expanded - Dark 
+![image](screens/Screenshot%20from%202023-07-19%2015-08-09.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-08-18.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-08-24.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-08-29.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-08-39.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-08-50.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-09-01.png)
+
+
 
 
 The application UI was designed with a mobile-first design approach. The screens have also been optimized to run smoothly on medium and larger screens,  such as tablets, folds, and desktops. The screens are also optimized for dark mode as shown above. 
@@ -218,8 +254,6 @@ On clicking on the “read more” button on the bottom sheet, a web page is sho
 There is a `DarkThemeConfig` enum class that holds the theming states. By default the theme is set to follow the device theme. To change this setting, the options menu on the `HistoryScreen`  provides the dialog on which the desired setting can be checked. The theming information is cached using the Proto DataStore library. The relevant files are located under the `datastore` package.
 
 
-
-![image](screenshots/Screenshot_20230421-225826.png)
-![image](screenshots/Screenshot_20230421-225837.png)
-![image](screenshots/Screenshot_20230421-225901.png)
+## More resources 
+For more information about this project checkout [Nkoyo Android app documentation](https://docs.google.com/document/d/16u-AEkb0Qr7EbX4RrrqyInAOh2i23XTeYYJo_XbAqUw/edit?usp=sharing)
 
