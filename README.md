@@ -31,7 +31,7 @@ The data layer is implemented as an offline-first source of app data and busines
 
 [Image here!]
 
-The app consists of the HistoryRepository, attach to this repository is the HistoryEntity model. Based on the repository design pattern, the HistoryRepository is the public API for the UI. It provides the only way the UI can access the HistoryEntity from the database. It offers several methods for reading and writing data.
+The app consists of the `HistoryRepository`, attach to this repository is the `HistoryEntity` model. Based on the repository design pattern, the `HistoryRepository` is the public API for the UI. It provides the only way the UI can access the `HistoryEntity` from the database. It offers several methods for reading and writing data.
 
 
 ##### Reading data 
@@ -53,12 +53,19 @@ The `OfflineFirstHistoryRepository` depends on the `HistoryDao` and the `History
 
 #### b. Domain Layer 
 The domain layer in this app houses all the relevant business logic. It consists of use cases, repository interfaces, and other helper classes. Use cases are classes having a single invocable method `(operator fun invoke)` containing business logic.
+
 In this layer, we have the interface `ComponentClassifier` which describes how the processing of the image caught by the camera would be classified to produce the label (component name) and probability.
+
 We also have the `HistoryRepository` interface which describes how the reading and the writing of the history data would be performed. This domain layer contains three use cases; `CameraPreviewUseCase`, `ImageAnalysisUseCase`, and the `ImageCaptureUseCase`.
+
 The `CameraPreviewUseCase` houses the logic that provides a camera preview stream for displaying on-screen. The preview screen is connected to the `Surface` provided via `Preview.SurfaceProvider`. The application decides how the `Surface` is shown, and is responsible for managing the `Surface` lifecycle after providing it.
+
 To display the preview with the correct orientation, the app needs to take different actions based on the source of the `Surface`. There are several sources from which the app could derive the preview `Surface`, e.g `SurfaceView`, `PreviewView`,  `ImageReader`, `MediaCodec`, `SurfaceTexture`,  `TextureView`, etc. 
+
 In this app, we used the `PreviewView` to provide the camera preview Surface, this is so that the `Surface` produced would always be in the device’s display orientation, saving us the extra boilerplate code to manually configure the Surface to be in sync with the device as it performs rotation. 
+
 The `ImageAnalysisUseCase` houses the logic that provides the CPU with accessible images on which the app will perform the image analysis. It returns an `ImageAnalysis` object which acquires images from the camera via an `ImageReader`. Each image is provided to an `ImageAnalysis.Analyzer` function which has been implemented on the UI layer, from here the app accesses the image data for image analysis via an `ImageProxy`. This proxy has to be closed after usage, lest future images be stalled or dropped depending on the backpressure strategy.
+
 The `ImageCaptureUseCase` houses the logic for taking a picture. It returns an `ImageCapture` object which provides the `takePicture()` function to take a picture to memory or save to a file, while providing image metadata.
 
 
