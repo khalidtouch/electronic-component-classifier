@@ -13,9 +13,32 @@ The User Interface makes up the visible parts of the application software. It is
 ### Screens 
 In this application, the UI was designed using the Figma design tool. Below are screenshots showing the various screens as embedded in the application.
 
-[Screens here!]
-![image](screenshots/Screenshot_20230421-225826.png)
+
+#### Mobile - Light
 ![image](screens/Screenshot%20from%202023-07-19%2014-55-21.png)
+![image](screens/Screenshot%20from%202023-07-19%2014-57-17.png)
+![image](screens/Screenshot%20from%202023-07-19%2014-57-36.png)
+![image](screens/Screenshot%20from%202023-07-19%2014-57-50.png)
+![image](screens/Screenshot%20from%202023-07-19%2014-58-09.png)
+![image](screens/Screenshot%20from%202023-07-19%2014-58-25.png)
+![image](screens/Screenshot%20from%202023-07-19%2014-58-37.png)
+![image](screens/Screenshot%20from%202023-07-19%2014-59-05.png)
+
+#### Mobile - Dark
+![image](screens/Screenshot%20from%202023-07-19%2014-59-38.png)
+![image](screens/Screenshot%20from%202023-07-19%2014-59-51.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-00-03.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-00-03.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-00-15.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-00-31.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-00-40.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-00-55.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-01-06.png)
+
+#### Medium - Light 
+![image](screens/Screenshot%20from%202023-07-19%2015-03-33.png)
+![image](screens/Screenshot%20from%202023-07-19%2015-03-44.png)
+
 
 The application UI was designed with a mobile-first design approach. The screens have also been optimized to run smoothly on medium and larger screens,  such as tablets, folds, and desktops. The screens are also optimized for dark mode as shown above. 
 
