@@ -263,15 +263,19 @@ For more information about this project checkout [Nkoyo Android app documentatio
 ## Computer Vision Part
 ### Overview
 The development of a CNN model for the identification of electronic components, using a deep learning framework.
+
 ![image](https://github.com/khalidtouch/electronic-component-classifier/assets/63509339/f02cdd5b-63a9-4361-bf90-05efadf5e5ce)
+
 The dataset for this project was gotten by scraping images from Google based on specified search keys using the Google image scraper library. After getting the photos, various preprocessing techniques would be carried out such as conversion to jpeg, data augmentation and resizing to improve the model’s accuracy and robustness. Thereafter, training, validation, and test sets are created from the dataset. Then, using transfer learning, the MobileNetV2 model was used. An Adam optimizer is used to develop the best possible performance of our task. The accuracy of the retrained model is used to assess its performance. A mobile app is then created that can take input images of electronic components and provide the classification results using the trained CNN model. The app will be deployed on the app store or other relevant platforms.
 
 ### MODEL DEVELOPMENT 
 A popular architecture for computer vision tasks on mobile devices is MobileNet. Developed by Google, MobileNet is specifically designed to be lightweight, efficient, and suitable for resource-constrained environments. This section outlines the various steps involved in developing a computer vision model using MobileNet. 
+
 ![image](https://github.com/khalidtouch/electronic-component-classifier/assets/63509339/fa82b9e4-577d-46da-9b6a-a933c57dbd3a)
 
 #### DATA ACQUISITION 
 The data acquisition stage was done by getting images from Google, using Google Image Scraper (the Code that was used is in this project folder) which is a Python library that facilitates data acquisition by automating the process of searching and downloading images from Google based on specific search criteria, and images from a Kaggle dataset. A total of 11,016 images were obtained and the classes contained in this dataset include capacitor, cartridge fuse, circuit breaker, filament bulb, LED, resistors, pulse generators, transistors, and Battery.
+
 ![image](https://github.com/khalidtouch/electronic-component-classifier/assets/63509339/d504efbc-8898-46dc-89d3-cccc619a2021)
 
 #### DATA PREPROCESSING 
@@ -283,6 +287,7 @@ MobileNet is a popular convolutional neural network (CNN) architecture designed 
  It achieves computational efficiency by utilizing depth-wise separable convolutions, which significantly reduce the number of parameters and operations compared to traditional convolutional layers. Depth-wise separable convolution is a technique that decomposes the standard convolution into two distinct operations:
 •	Depth-wise Convolution: The depthwise convolution applies a single convolutional filter to each input channel
 •	Point-wise Convolution: The depth-wise output is then convolved with a 1x1 kernel to perform dimensionality reduction and combine the feature maps.
+
 ![image](https://github.com/khalidtouch/electronic-component-classifier/assets/63509339/29bbb4e4-aa92-44e3-a0a3-16e815af88bc)
 ![image](https://github.com/khalidtouch/electronic-component-classifier/assets/63509339/32052380-2cc3-4282-8155-61a0dc2a21cb)
 
@@ -302,7 +307,9 @@ f( y_(i  )) = 〖e 〗^yi/Ƹ_(k e^yk )
 
 Where 〖e 〗^yi = exponential of a particular class
 And  Ƹ_(k e^yk ) = sum of exponential of each class
+
 ![image](https://github.com/khalidtouch/electronic-component-classifier/assets/63509339/41a89f79-0a4f-494f-acba-fba251df6e3a)
+ 
 We feed the trained image into the network. The network is trained to predict the input among these 10 classes. The softmax function calculates the probability for each class. It is used as an output layer for each neural network. 
 P1 + P2 +P3 +P4 +P5+P6 +P7 +P8 +P9+P10= 1
 
@@ -331,6 +338,7 @@ f(x) = x if x >= 0
 #### TESTING PHASE 
 In the testing phase, the trained model is used to make predictions on unseen data to evaluate its performance further. The CNN inputs a test set of images (or other forms of data) and generates predictions for each image during testing. The model’s accuracy was then assessed by contrasting the test set’s actual labels with those predicted by the model. The testing dataset should be prepared similarly to the training and validation datasets, with appropriate pre-processing and directory structure.
 The model's predictions on the testing dataset can be evaluated using metrics such as accuracy, precision, recall, and F1 score.
+
 ![image](https://github.com/khalidtouch/electronic-component-classifier/assets/63509339/154b8b02-4866-409d-9dcc-400bbd4d0d8a)
 ![image](https://github.com/khalidtouch/electronic-component-classifier/assets/63509339/ef0cafe6-394f-43f5-aa03-b18e6c62761c)
 ![image](https://github.com/khalidtouch/electronic-component-classifier/assets/63509339/a53566c7-584c-4743-aa6a-c3a1dcc13537)
